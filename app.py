@@ -8,7 +8,7 @@
 from flask import Flask, request, jsonify
 from firebase_admin import credentials, firestore, initialize_app
 from datetime import datetime
-
+import password as pw
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -43,7 +43,6 @@ def home():
     Test landing page
     """
     return "This is the landing page for now."
-
 
 
 @app.route('/sign_up', methods=['POST'])
@@ -105,6 +104,40 @@ def user_account():
         return f"An Error Occured: {e}"    
 
 
+# Handles logging in and logging out
+@app.route('/login', methods=['GET', 'POST','DELETE'])
+def login():
+    authObject = request.authorization
+    loginUserPW = authObject.password
+    loginUserName = authObject.username
+
+    if request.method == 'POST':
+        users = db.collection('Users').stream()
+        for user in users:
+            userDict = user.to_dict()
+            dbUserName = userDict['username']
+            dbSalt = userDict['salt']
+            dbHash = userDict['hash']
+            if dbUserName == loginUserName:
+                if pw.isValidPassword(dbSalt, loginUserPW, dbHash):
+                    # User is logged in
+                    pass
+        # Handle Login fail here
+        return "Login Failed"
+        
+    # Handles logging out (Maybe we could use this route)
+    elif request.method == 'DELETE':
+        pass
+
+    # GET - depends if login page is implemented
+    else:
+        # render normal login page?
+        pass
+
+# Second options for handling log out
+@app.route('/logout', methods=['GET'])
+def logout():
+    pass
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
