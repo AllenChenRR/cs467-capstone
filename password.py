@@ -4,7 +4,7 @@ import string
 from datetime import datetime
 
 
-def _createSalt(length):
+def _create_salt(length):
     """Returns a randomly generated string that contains alphanumeric characters
         of specified length"
     """
@@ -13,7 +13,7 @@ def _createSalt(length):
                                   k=length))
 
 
-def returnSaltHash(password):
+def return_salt_hash(password):
     """Returns the salt and hash value of the salted password
 
     Args:
@@ -23,13 +23,13 @@ def returnSaltHash(password):
         tuple: A 2-tuple that contains the salt and hash respectively
     """
     size = 32
-    salt = _createSalt(size)
-    hashObj = hashlib.sha256(password.encode() + salt.encode())
-    hashed = hashObj.hexdigest()
+    salt = _create_salt(size)
+    hash_obj = hashlib.sha256(password.encode() + salt.encode())
+    hashed = hash_obj.hexdigest()
     return (salt, hashed)
 
 
-def isValidPassword(salt, password, hash):
+def is_valid_password(salt, password, hash):
     """ Determines if password is valid
 
     Args:
@@ -40,6 +40,6 @@ def isValidPassword(salt, password, hash):
     Returns:
         Returns a true if password is valid, otherwise returns false
     """
-    hashObj = hashlib.sha256(password.encode() + salt.encode())
-    hashed = hashObj.hexdigest()
+    hash_obj = hashlib.sha256(password.encode() + salt.encode())
+    hashed = hash_obj.hexdigest()
     return hashed == hash
