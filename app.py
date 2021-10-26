@@ -5,18 +5,24 @@
 # Notes and other useful things
 # https://stackoverflow.com/questions/11556958/sending-data-from-html-form-to-a-python-script-in-flask
 
-from flask import Flask, request, jsonify
-from firebase_admin import credentials, firestore, initialize_app
 from datetime import datetime
-
+from firebase_admin import credentials, firestore, initialize_app
+from flask import Flask, jsonify, redirect, request, session
+from flask.helpers import url_for
+import password as pw
+import usermodel as model
 
 # Initialize Flask app
 app = Flask(__name__)
 
+# Set secret key for sessions
+app.secret_key = "sdkfjDCVBsdjKkl%@%23$"
+
 # Initialize Firestore DB
-cred = credentials.Certificate('key.json')
+cred = credentials.Certificate('serviceAccountKey.json')
 default_app = initialize_app(cred)
 db = firestore.client()
+
 
 def get_user_id(req):
     """
@@ -27,9 +33,9 @@ def get_user_id(req):
 
     # Query the "users" collection for the document with the matching email
     query_ref = user_ref.where('email', '==', req['email'])
-    all = list(query_ref.stream()) # is ther ea better way of doing this?
+    all = list(query_ref.stream())  # is ther ea better way of doing this?
     if len(all) != 1:
-        # something went wrong 
+        # something went wrong
         return len(all)
     else:
         # There must be excatly one document in the stream
@@ -45,13 +51,12 @@ def home():
     return "This is the landing page for now."
 
 
-
 @app.route('/sign_up', methods=['POST'])
-def sign_up(): # this could also be used to GET all profiles if we need it
+def sign_up():  # this could also be used to GET all profiles if we need it
 
     """
         sign_up() : Add document to Firestore collection with request body.
-        e.g. json={       
+        e.g. json={
             'first': 'John',
             'last': 'Smith',
             'password': 'abc123'}
@@ -59,7 +64,7 @@ def sign_up(): # this could also be used to GET all profiles if we need it
         Notes: We could also use a custom ID if needed
     """
     user_ref = db.collection('users')
-    if request.method == 'POST': # will there only be post on the route?
+    if request.method == 'POST':  # will there only be post on the route?
         try:
             request_dict = request.json
             request_dict["admin"] = False
@@ -77,7 +82,7 @@ def sign_up(): # this could also be used to GET all profiles if we need it
 def user_account():
     """
     Not final but works
-    Does it make sense to have this one route do everything? 
+    Does it make sense to have this one route do everything?
     """
     try:
         user_ref = db.collection('users')
@@ -100,10 +105,47 @@ def user_account():
             else:
                 return {"error": "More than one account with that email"}, 400
 
-
     except Exception as e:
-        return f"An Error Occured: {e}"    
+        return f"An Error Occured: {e}"
 
+
+# Handles logging in and logging out
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+
+    if request.method == 'POST':
+        auth_object = request.authorization
+        login_user_pw = auth_object.password
+        login_username = auth_object.username
+        users = db.collection('Users').stream()
+        for user in users:
+            user_dict = user.to_dict()
+            username = user_dict['username']
+            salt = user_dict['salt']
+            hash = user_dict['hash']
+            first_name = user_dict['first_name']
+            last_name = user_dict['last_name']
+            is_admin = user_dict['is_admin']
+
+            if username == login_username:
+                if pw.is_valid_password(salt, login_user_pw, hash):
+                    user_obj = model.User(username, first_name, last_name,
+                                          is_admin)
+                    session['user'] = user_obj.__dict__
+                return redirect(url_for('home'))
+        # Placeholder for handling login failure
+        return 'Login Failed'
+    # GET - depends if login page is implemented
+    else:
+        return "Login Page Placeholder"
+
+
+# Second option for handling log out
+@app.route('/logout', methods=['GET'])
+def logout():
+    if 'user' in session:
+        session.pop('user', None)
+    return redirect(url_for('home'))
 
 
 if __name__ == '__main__':
