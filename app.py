@@ -8,9 +8,9 @@
 from datetime import datetime
 from firebase_admin import credentials, firestore, initialize_app
 from flask import Flask, jsonify, redirect, request, session, render_template, flash, url_for
-from flask.helpers import url_for
 import password as pw
 import usermodel as model
+import traceback
 from forms import RegistrationForm, LoginForm
 
 # Initialize Flask app
@@ -114,34 +114,13 @@ def user_account():
         return "", 204
 
 
-
-# @app.route("/login", methods=["GET", "POST"])
-# def login():
-#     form = LoginForm()
-    
-#     if form.validate_on_submit(): # this is checking that the data in the form was valid, hasn't checked against DB yet
-#         login_valid = True # this condition can be changed 
-
-
-#         if login_valid:
-#             flash(f'Welcome, {form.email.data}', 'success') # can change to first name later
-#             # TODO: You can access the form data with the variables form.email.data 
-#             # and form.password.data to check if it's valid, then do whatever you need to do with the DB here
-#             return redirect(url_for('home'))
-#         else:
-#             # in case of an unsuccessful login
-#             flash('Login unsuccessful. Please try again.', 'danger')
-
-#     return render_template("login.html", title="Login To Your Account", form=form)
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         try:
             login_user_pw = form.email.data
-            login_username = form.password.data
+            login_username = form.email.data
             users = db.collection('Users').stream()
             for user in users:
                 user_dict = user.to_dict()
@@ -161,10 +140,9 @@ def login():
                     return redirect(url_for('home'))
         except Exception as e:
             # Placeholder for handling login failure
-            print(e)
+            traceback.print_exc()
             flash('Login unsuccessful. Please try again.', 'danger')
-    # GET - depends if login page is implemented
-    
+
     return render_template("login.html", title="Login To Your Account", form=form)
 
 # Second option for handling log out
