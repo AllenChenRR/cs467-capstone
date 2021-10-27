@@ -8,3 +8,6 @@ MarkupSafe==2.0.1
 pkg_resources==0.0.0
 Werkzeug==2.0.2
 Flask-Session==2.1.1
+Flask-WTF==0.15.1
+WTForms==2.3.3
+email_validator==1.1.3
