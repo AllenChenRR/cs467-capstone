@@ -46,6 +46,17 @@ def get_user(req):
     all = list(query_ref.stream())
     return len(all) if len(all) != 1 else all[0] 
 
+def get_user_by_email(email):
+    """
+    Returns the unique user document in the users collection
+    """
+    user_ref = db.collection('Users')
+    query_ref = user_ref.where('email', '==', email)
+    all = list(query_ref.stream())
+    return len(all) if len(all) != 1 else all[0] 
+
+def validate_user():
+    pass
 
 @app.route("/", methods=['GET'])
 @app.route("/home")
@@ -56,61 +67,51 @@ def home():
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     form = RegistrationForm()
-    user_ref = db.collection('Users')
     if form.validate_on_submit():
+        try:
+            # Check if the email is already in the database.
+            if get_user_by_email(form.email.data):
+                flash(f'Email { form.email.data } is already in use.') # borrowed from below...We can change this.
+                return render_template("signup.html", title="Sign Up", form=form)
 
-        request_dict = {}
-        password = form.password.data
-        hash_result = pw.return_salt_hash(password) 
-        request_dict["first_name"] = form.first_name.data
-        request_dict["last_name"] = form.last_name.data
-        request_dict["email"] = form.email.data
-        request_dict["salt"] = hash_result[0]
-        request_dict["hash"] = hash_result[1]
-        request_dict["is_admin"] = False
-        request_dict["last_update"] = datetime.now()
+            # Add new user to the database.
+            password = form.password.data
+            hash_result = pw.return_salt_hash(password) 
+            
+            request_dict = {
+            "first_name": form.first_name.data,
+            "last_name": form.last_name.data,
+            "email": form.email.data,
+            "salt": hash_result[0],
+            "hash": hash_result[1],
+            "is_admin": False,
+            "last_update": datetime.now()}
+
+            user_ref = db.collection('Users')
+            user_ref.document().set(request_dict)
+
+            flash(f'Account created for { form.email.data }', 'success')
+            return redirect(url_for('home'))
         
-        user_ref.document().set(request_dict)
+        except Exception as e:
+            return f"An Error Occured: {e}"
 
-        flash(f'Account created for { form.email.data }', 'success')
-        return redirect(url_for('home'))
-    
     return render_template("signup.html", title="Sign Up", form=form)
 
-# ignore this for now...
-# # break this up?
-# @app.route('/account', methods=['DELETE', 'POST', 'PATCH'])
-# def user_account():
-#     """
-#     Not final but works
-#     Does it make sense to have this one route do everything?
-#     """
-#     try:
-#         user_ref = db.collection('users')
-#         user_id = get_user_id(request.json)
-#         if not isinstance(user_id, int):
-#             if request.method == 'POST':
-#                 user = user_ref.document(user_id).get()
-#                 return jsonify(user.to_dict()), 200
-#             if request.method == 'DELETE':
-#                 user_ref.document(user_id).delete()
-#                 return "", 204
-#             # elif request.method == 'PATCH': ### not working yet
-#             #     user_ref.document(user_id).update(request.json, merge=True) # need to validate the request json
-#                 return "updated", 200
-#             else:
-#                 return {"error": "Method Not Allowed"}, 405
-#         else:
-#             if not user_id:
-#                 return {"error": "email does not exist"}, 400
-#             else:
-#                 return {"error": "More than one account with that email"}, 400
 
-#     except Exception as e:
-#         return f"An Error Occured: {e}"
+@app.route('/account', methods=['DELETE', 'POST', 'PATCH'])
+def user_account():
+    """
+    DELETE - Used for testing purposes. Possibly to admins to delete public users.
+    Users do not need to be logged in to be deleted.
 
-
-
+    """
+    # A user does not need to be loged in to have their account deleted.
+    if request.method == 'DELETE':
+        user_ref = db.collection('Users')
+        user_id = get_user_by_email(request.json["email"]).id
+        user_ref.document(user_id).delete()
+        return "", 204
 
 
 
@@ -120,6 +121,8 @@ def signup():
     
 #     if form.validate_on_submit(): # this is checking that the data in the form was valid, hasn't checked against DB yet
 #         login_valid = True # this condition can be changed 
+
+
 #         if login_valid:
 #             flash(f'Welcome, {form.email.data}', 'success') # can change to first name later
 #             # TODO: You can access the form data with the variables form.email.data 
@@ -133,34 +136,34 @@ def signup():
 
 
 # Handles logging in and logging out
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
 
-    if request.method == 'POST':
-        auth_object = request.authorization
-        login_user_pw = auth_object.password
-        login_username = auth_object.username
-        users = db.collection('Users').stream()
-        for user in users:
-            user_dict = user.to_dict()
-            username = user_dict['username']
-            salt = user_dict['salt']
-            hash = user_dict['hash']
-            first_name = user_dict['first_name']
-            last_name = user_dict['last_name']
-            is_admin = user_dict['is_admin']
+#     if request.method == 'POST':
+#         auth_object = request.authorization
+#         login_user_pw = auth_object.password
+#         login_username = auth_object.username
+#         users = db.collection('Users').stream()
+#         for user in users:
+#             user_dict = user.to_dict()
+#             username = user_dict['username']
+#             salt = user_dict['salt']
+#             hash = user_dict['hash']
+#             first_name = user_dict['first_name']
+#             last_name = user_dict['last_name']
+#             is_admin = user_dict['is_admin']
 
-            if username == login_username:
-                if pw.is_valid_password(salt, login_user_pw, hash):
-                    user_obj = model.User(username, first_name, last_name,
-                                          is_admin)
-                    session['user'] = user_obj.__dict__
-                return redirect(url_for('home'))
-        # Placeholder for handling login failure
-        return 'Login Failed'
-    # GET - depends if login page is implemented
-    else:
-        return "Login Page Placeholder"
+#             if username == login_username:
+#                 if pw.is_valid_password(salt, login_user_pw, hash):
+#                     user_obj = model.User(username, first_name, last_name,
+#                                           is_admin)
+#                     session['user'] = user_obj.__dict__
+#                 return redirect(url_for('home'))
+#         # Placeholder for handling login failure
+#         return 'Login Failed'
+#     # GET - depends if login page is implemented
+#     else:
+#         return "Login Page Placeholder"
 
 
 # Second option for handling log out
