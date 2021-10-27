@@ -135,36 +135,37 @@ def user_account():
 #     return render_template("login.html", title="Login To Your Account", form=form)
 
 
-# Handles logging in and logging out
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        try:
+            login_user_pw = form.email.data
+            login_username = form.password.data
+            users = db.collection('Users').stream()
+            for user in users:
+                user_dict = user.to_dict()
+                username = user_dict['email']
+                salt = user_dict['salt']
+                hash = user_dict['hash']
+                first_name = user_dict['first_name']
+                last_name = user_dict['last_name']
+                is_admin = user_dict['is_admin']
 
-#     if request.method == 'POST':
-#         auth_object = request.authorization
-#         login_user_pw = auth_object.password
-#         login_username = auth_object.username
-#         users = db.collection('Users').stream()
-#         for user in users:
-#             user_dict = user.to_dict()
-#             username = user_dict['username']
-#             salt = user_dict['salt']
-#             hash = user_dict['hash']
-#             first_name = user_dict['first_name']
-#             last_name = user_dict['last_name']
-#             is_admin = user_dict['is_admin']
-
-#             if username == login_username:
-#                 if pw.is_valid_password(salt, login_user_pw, hash):
-#                     user_obj = model.User(username, first_name, last_name,
-#                                           is_admin)
-#                     session['user'] = user_obj.__dict__
-#                 return redirect(url_for('home'))
-#         # Placeholder for handling login failure
-#         return 'Login Failed'
-#     # GET - depends if login page is implemented
-#     else:
-#         return "Login Page Placeholder"
-
+                if username == login_username:
+                    if pw.is_valid_password(salt, login_user_pw, hash):
+                        user_obj = model.User(username, first_name, last_name,
+                                            is_admin)
+                        session['user'] = user_obj.__dict__
+                    flash(f'Welcome, {first_name}', 'success')
+                    return redirect(url_for('home'))
+        except Exception as e:
+            # Placeholder for handling login failure
+            print(e)
+            flash('Login unsuccessful. Please try again.', 'danger')
+    # GET - depends if login page is implemented
+    
+    return render_template("login.html", title="Login To Your Account", form=form)
 
 # Second option for handling log out
 @app.route('/logout', methods=['GET'])
