@@ -122,7 +122,8 @@ def user_account():
 def login():
     if 'user' in session:
         flash(f"Already logged in, {session['user']['first_name']}", 'success')
-        return redirect(request.referrer)
+        if request.referrer is not None:
+            return redirect(request.referrer)
     form = LoginForm()
     if form.validate_on_submit():
         try:
