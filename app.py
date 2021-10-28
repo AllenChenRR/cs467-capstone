@@ -116,33 +116,35 @@ def user_account():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if 'user' in session:
+        flash(f"Already logged in, {session['user']['first_name']}", 'success')
+        return redirect(request.referrer)
     form = LoginForm()
     if form.validate_on_submit():
         try:
-            login_user_pw = form.email.data
-            login_username = form.email.data
-            users = db.collection('Users').stream()
+            count = 0
+            login_email = form.email.data
+            login_user_pw = form.password.data
+            users = db.collection('Users').where('email', '==', login_email)\
+                                 .stream()
             for user in users:
+                count += 1
                 user_dict = user.to_dict()
-                username = user_dict['email']
+                email = user_dict['email']
                 salt = user_dict['salt']
                 hash = user_dict['hash']
                 first_name = user_dict['first_name']
                 last_name = user_dict['last_name']
                 is_admin = user_dict['is_admin']
-
-                if username == login_username:
-                    if pw.is_valid_password(salt, login_user_pw, hash):
-                        user_obj = model.User(username, first_name, last_name,
-                                            is_admin)
-                        session['user'] = user_obj.__dict__
+                if pw.is_valid_password(salt, login_user_pw, hash):
+                    user_obj = model.User(email, first_name, last_name, 
+                                          is_admin)
+                    session['user'] = user_obj.__dict__
                     flash(f'Welcome, {first_name}', 'success')
                     return redirect(url_for('home'))
         except Exception as e:
-            # Placeholder for handling login failure
             traceback.print_exc()
             flash('Login unsuccessful. Please try again.', 'danger')
-
     return render_template("login.html", title="Login To Your Account", form=form)
 
 # Second option for handling log out

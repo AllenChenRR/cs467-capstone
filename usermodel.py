@@ -1,13 +1,13 @@
 class User():
-    def __init__(self, username: str,
-                 firstName: str,
-                 lastName: str,
-                 isAdmin=False):
-        self.username = username
-        self.firstName = firstName
-        self.lastName = lastName
-        self.isAdmin = isAdmin
+    def __init__(self, email: str,
+                 first_name: str,
+                 last_name: str,
+                 is_admin=False):
+        self.email = email
+        self.first_name = first_name
+        self.last_name = last_name
+        self.is_admin = is_admin
 
 class TestUser():
-    def __init__(self, username='testing username'):
-        self.username = username
+    def __init__(self, email='testing email'):
+        self.email = email
