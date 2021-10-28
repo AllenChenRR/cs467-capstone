@@ -90,6 +90,10 @@ def signup():
             user_ref = db.collection('Users')
             user_ref.document().set(request_dict)
 
+            # Logs current user out if new registration occurs
+            if 'user' in session:
+                session.pop('user', None)
+
             flash(f'Account created for { form.email.data }', 'success')
             return redirect(url_for('home'))
         
@@ -142,9 +146,11 @@ def login():
                     session['user'] = user_obj.__dict__
                     flash(f'Welcome, {first_name}', 'success')
                     return redirect(url_for('home'))
+            flash('Login unsuccessful. Please try again.', 'danger')
+            return render_template("login.html", title="Login To Your Account", form=form)
         except Exception as e:
             traceback.print_exc()
-            flash('Login unsuccessful. Please try again.', 'danger')
+            # flash('Login unsuccessful. Please try again.', 'danger')
     return render_template("login.html", title="Login To Your Account", form=form)
 
 # Second option for handling log out
