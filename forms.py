@@ -27,5 +27,5 @@ class AccountForm(FlaskForm):
     email = StringField('Email', validators=[Email()])
     password = PasswordField('Enter Current Password To Update Account', validators=[DataRequired()])
     new_password = PasswordField('New Password')
-    confirm_password = PasswordField('Confirm Password')
+    confirm_password = PasswordField('Confirm Password', validators=[EqualTo('new_password')])
     submit = SubmitField('Update')
