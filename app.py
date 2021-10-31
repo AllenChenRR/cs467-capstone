@@ -11,7 +11,7 @@ from flask import Flask, jsonify, redirect, request, session, render_template, f
 import password as pw
 import usermodel as model
 import traceback
-from forms import RegistrationForm, LoginForm
+from forms import RegistrationForm, LoginForm, AccountForm
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -29,34 +29,115 @@ default_app = initialize_app(cred)
 db = firestore.client()
 
 
-def get_user_id(req):
-    """
-    Returns the unique ID from a specific document in the users collection or an int if the user is not found.
-
-    """
-    user = get_user(req)
-    return user if isinstance(user, int) else user.id
-
-def get_user(req):
-    """
-    Returns the unique user document in the users collection
-    """
-    user_ref = db.collection('Users')
-    query_ref = user_ref.where('email', '==', req['email'])
-    all = list(query_ref.stream())
-    return len(all) if len(all) != 1 else all[0] 
-
+####################################################################
+# public methods
 def get_user_by_email(email):
     """
-    Returns the unique user document in the users collection
+    Returns a user data dictionary 
     """
-    user_ref = db.collection('Users')
-    query_ref = user_ref.where('email', '==', email)
-    all = list(query_ref.stream())
-    return len(all) if len(all) != 1 else all[0] 
+    document = _get_document("Users", email=email)
+    return _get_document_data(document)
 
-def validate_user():
-    pass
+def get_user_by_id(doc_id):
+    """
+    Returns a user data dictionary 
+    """
+    document = _get_document("Users", doc_id=doc_id)
+    return _get_document_data(document)
+
+def get_salt_and_hash(doc_id):
+    """
+    Returns document salt and hash values as a tuple.
+    """
+    doc = get_user_by_id(doc_id)
+    return (doc["salt"], doc["hash"])
+
+def add_user(form):
+    """
+    Adds a new user to the database
+    """
+    data = _format_user_data(form, new_user=True)
+    _set_document("Users", data)
+
+def update_user(form, user_id):
+    """
+    Updates an existing user in the database
+    """
+    data = _format_user_data(form, user_id)
+    _set_document("Users", data, doc_id=user_id)
+    
+    # remove salt and hash to update session
+    del data['salt']
+    del data['hash']
+    data['id'] = user_id
+    _set_session(data)
+#######################################################################
+# helper methods
+def _get_document(collection, email=None, doc_id=None):
+    """
+    Returns a collection document or None
+    """
+    collection_ref = db.collection(collection)
+    if email:
+        query_ref = collection_ref.where('email', '==', email)
+        # There should only be one match
+        result_stream = list(query_ref.stream())
+        if len(result_stream) == 1:
+            return result_stream[0]
+    elif doc_id:
+        query_ref = collection_ref.document(doc_id)
+        if query_ref:
+            return query_ref.get()
+
+    return None
+
+def _get_document_data(document):
+    """
+    Returns a dictionary of the collection document attributes or None.
+    """
+    document_data = None
+    if document:
+        document_data = document.to_dict()
+        document_data['id'] = document.id
+    return document_data
+
+def _format_user_data(form, user_id=None, new_user=False):
+    """
+    Transforms the form data to a form that can be uploaded to the database
+    """
+    data = {
+        "first_name": form.first_name.data,
+        "last_name": form.last_name.data,
+        "email": form.email.data,
+        "is_admin": False,
+        "last_update": datetime.now()}
+
+    if isinstance(form, AccountForm) and form.new_password.data:
+        password = form.new_password.data
+    else:
+        password = form.password.data
+
+    hash_result = pw.return_salt_hash(password) 
+    data["salt"] = hash_result[0]
+    data["hash"] = hash_result[1]
+    return data
+
+def _set_document(collection, data, doc_id=None):
+    """
+    Add or update collection document in Firestore
+    """
+    doc_ref = db.collection(collection)
+    if doc_id:
+        doc_ref.document(doc_id).set(data)
+    else:
+        doc_ref.document().set(data)
+
+def _set_session(data):
+    """
+    Updates session data with user data after an update.
+    """
+    session['user'] = data
+#####################################################################
 
 @app.route("/", methods=['GET'])
 @app.route("/home")
@@ -66,29 +147,19 @@ def home():
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
+    """
+    Add a new user ot the database
+    """
     form = RegistrationForm()
     if form.validate_on_submit():
         try:
             # Check if the email is already in the database.
             if get_user_by_email(form.email.data):
-                flash(f'Email { form.email.data } is already in use.') # borrowed from below...We can change this.
+                flash(f'Email { form.email.data } is already in use.')
                 return render_template("signup.html", title="Sign Up", form=form)
 
-            # Add new user to the database.
-            password = form.password.data
-            hash_result = pw.return_salt_hash(password) 
-            
-            request_dict = {
-            "first_name": form.first_name.data,
-            "last_name": form.last_name.data,
-            "email": form.email.data,
-            "salt": hash_result[0],
-            "hash": hash_result[1],
-            "is_admin": False,
-            "last_update": datetime.now()}
-
-            user_ref = db.collection('Users')
-            user_ref.document().set(request_dict)
+            # Add a new user to the database.
+            add_user(form)
 
             # Logs current user out if new registration occurs
             if 'user' in session:
@@ -103,19 +174,28 @@ def signup():
     return render_template("signup.html", title="Sign Up", form=form)
 
 
-@app.route('/account', methods=['DELETE', 'POST', 'PATCH'])
+@app.route('/account', methods=['POST', 'GET'])
 def user_account():
     """
-    DELETE - Used for testing purposes. Possibly to admins to delete public users.
-    Users do not need to be logged in to be deleted.
-
+    'GET' - populates Account update form with the current user data from the database
+    'POST' - Updates database with all data for the user from the content of the Account update form
     """
-    # A user does not need to be loged in to have their account deleted.
-    if request.method == 'DELETE':
-        user_ref = db.collection('Users')
-        user_id = get_user_by_email(request.json["email"]).id
-        user_ref.document(user_id).delete()
-        return "", 204
+    form = AccountForm()
+    if request.method == 'GET':
+        form.first_name.data = session['user']['first_name']
+        form.last_name.data = session['user']['last_name']
+        form.email.data = session['user']['email']
+
+    elif request.method == 'POST':
+        user_id = session['user']['id']
+        salt, hash = get_salt_and_hash(user_id)
+        if pw.is_valid_password(salt, form.password.data, hash):
+            update_user(form, user_id)
+            flash('Update successful!', 'success')
+
+        else:
+            flash('Update unsuccessful. Please try again.', 'danger')
+    return render_template("account.html", title="Account", form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -148,6 +228,8 @@ def login():
                     user_obj = model.User(email, first_name, last_name, 
                                           is_admin)
                     session['user'] = user_obj.__dict__
+                    session['user']['id'] = user.id 
+                    
                     flash(f'Welcome, {first_name}', 'success')
                     return redirect(url_for('home'))
             flash('Login unsuccessful. Please try again.', 'danger')
