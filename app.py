@@ -187,11 +187,12 @@ def user_account():
         form.email.data = session['user']['email']
 
     elif request.method == 'POST':
-        user_id = session['user']['id']
-        salt, hash = get_salt_and_hash(user_id)
-        if pw.is_valid_password(salt, form.password.data, hash):
-            update_user(form, user_id)
-            flash('Update successful!', 'success')
+        if form.validate_on_submit():
+            user_id = session['user']['id']
+            salt, hash = get_salt_and_hash(user_id)
+            if pw.is_valid_password(salt, form.password.data, hash):
+                update_user(form, user_id)
+                flash('Update successful!', 'success')
 
         else:
             flash('Update unsuccessful. Please try again.', 'danger')
