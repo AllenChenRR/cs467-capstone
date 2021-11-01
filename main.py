@@ -24,7 +24,7 @@ app.secret_key = "sdkfjDCVBsdjKkl%@%23$"
 
 # Initialize Firestore DB
 # cred = credentials.Certificate('serviceAccountKey.json')
-cred = credentials.Certificate('Key.json') # jamie's db
+cred = credentials.Certificate('key.json') # jamie's db
 default_app = initialize_app(cred)
 db = firestore.client()
 
