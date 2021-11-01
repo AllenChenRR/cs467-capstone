@@ -30,12 +30,21 @@
             <span class="visually-hidden">(current)</span>
           </a>
                 </li>
+                {% if session['user'] %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('user_account') }}">Account</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+                {% else %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('login') }}">Login</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('signup') }}">Sign Up</a>
                 </li>
+                {% endif %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Dropdown</a>
                     <div class="dropdown-menu">
@@ -53,21 +62,13 @@
 
 <body>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-   {% if messages %}
-      {% for category, message in messages %}
-        <div class="alert alert-dismissible alert-{{ category }} w-75 mx-auto">
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+    <div class="alert alert-dismissible alert-{{ category }} w-75 mx-auto">
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </button>
-                {{ message }}
-            </div>
-      {% endfor %}
-   {% endif %}
-{% endwith %} 
-
-
-{% block content %} 
-{% endblock content %}
+        </button>
+        {{ message }}
+    </div>
+    {% endfor %} {% endif %} {% endwith %} {% block content %} {% endblock content %}
 
     <!-- Optional JavaScript; choose one of the two! -->
 
