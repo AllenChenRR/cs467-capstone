@@ -193,7 +193,8 @@ def user_account():
             if pw.is_valid_password(salt, form.password.data, hash):
                 update_user(form, user_id)
                 flash('Update successful!', 'success')
-
+            else:
+                flash('Update unsuccessful. Please try again.', 'danger')
         else:
             flash('Update unsuccessful. Please try again.', 'danger')
     return render_template("account.html", title="Account", form=form)
