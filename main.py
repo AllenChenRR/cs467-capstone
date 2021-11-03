@@ -258,6 +258,10 @@ def logout():
         session.pop('user', None)
     return redirect(url_for('home'))
 
+@app.route('/browse-pets', methods=['GET'])
+
+def browse_pets():
+    return render_template('browse-pets.html', title="Browse Available Pets")
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
