@@ -155,7 +155,7 @@ def signup():
         try:
             # Check if the email is already in the database.
             if get_user_by_email(form.email.data):
-                flash(f'Email { form.email.data } is already in use.')
+                flash(f'Email { form.email.data } is already in use.', 'danger')
                 return render_template("signup.html", title="Sign Up", form=form)
 
             # Add a new user to the database.
@@ -187,16 +187,26 @@ def user_account():
         form.email.data = session['user']['email']
 
     elif request.method == 'POST':
-        if form.validate_on_submit():
-            user_id = session['user']['id']
-            salt, hash = get_salt_and_hash(user_id)
-            if pw.is_valid_password(salt, form.password.data, hash):
-                update_user(form, user_id)
-                flash('Update successful!', 'success')
+        try:
+            if form.validate_on_submit():
+                user_id = session['user']['id']
+
+                # Check if the email is already in use
+                user = get_user_by_email(form.email.data)
+                if user and user["id"] != user_id:
+                    flash(f'Email { form.email.data } is already in use.', 'danger')
+                    return redirect('/account')
+
+                salt, hash = get_salt_and_hash(user_id)
+                if pw.is_valid_password(salt, form.password.data, hash):
+                    update_user(form, user_id)
+                    flash('Update successful!', 'success')
+                else:
+                    flash('Invalid password. Please try again.', 'danger')
             else:
                 flash('Update unsuccessful. Please try again.', 'danger')
-        else:
-            flash('Update unsuccessful. Please try again.', 'danger')
+        except Exception as e:
+            return f"An Error Occured: {e}"
     return render_template("account.html", title="Account", form=form)
 
 
