@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container w-50 mt-5">
+
+<form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <div class="form-group">
+                {{ form.name.label(class="form-label") }} 
+
+                {% if form.name.errors %}
+                	{{ form.name(class="form-control is-invalid")}}
+                	<div class="invalid-feedback">
+                		{% for error in form.name.errors %}
+                		<span> {{ error }} </span>
+                		{% endfor %}
+                	</div>
+                {% else %}
+     
+                	{{ form.name(class="form-control") }}
+                
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.animal_type.label(class="form-label") }} 
+
+                {% if form.animal_type.errors %}
+                	{{ form.animal_type(class="form-control is-invalid")}}
+                	<div class="invalid-feedback">
+                		{% for error in form.animal_type.errors %}
+                		<span> {{ error }} </span>
+                		{% endfor %}
+                	</div>
+                {% else %}
+     
+                	{{ form.animal_type(class="form-select") }}
+                
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.breed.label(class="form-label") }} 
+
+                {% if form.breed.errors %}
+                	{{ form.breed(class="form-control is-invalid")}}
+                	<div class="invalid-feedback">
+                		{% for error in form.breed.errors %}
+                		<span> {{ error }} </span>
+                		{% endfor %}
+                	</div>
+                {% else %}
+     
+                	{{ form.breed(class="form-control") }}
+                
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.disposition.label(class="form-label") }} 
+
+                {% if form.disposition.errors %}
+                	{{ form.disposition(class="form-control is-invalid")}}
+                	<div class="invalid-feedback">
+                		{% for error in form.disposition.errors %}
+                		<span> {{ error }} </span>
+                		{% endfor %}
+                	</div>
+                {% else %}
+     
+                	{{ form.disposition(class="form-select") }}
+                
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.availability.label(class="form-label") }} 
+
+                {% if form.availability.errors %}
+                	{{ form.availability(class="form-control is-invalid")}}
+                	<div class="invalid-feedback">
+                		{% for error in form.availability.errors %}
+                		<span> {{ error }} </span>
+                		{% endfor %}
+                	</div>
+                {% else %}
+     
+                	{{ form.availability(class="form-select") }}
+                
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.description.label(class="form-label") }} 
+
+                {% if form.description.errors %}
+                	{{ form.description(class="form-control is-invalid")}}
+                	<div class="invalid-feedback">
+                		{% for error in form.description.errors %}
+                		<span> {{ error }} </span>
+                		{% endfor %}
+                	</div>
+                {% else %}
+     
+                	{{ form.description(class="form-control") }}
+                
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.image.label(class="form-label") }} 
+
+                {% if form.image.errors %}
+                	{{ form.image(class="form-control is-invalid")}}
+                	<div class="invalid-feedback">
+                		{% for error in form.image.errors %}
+                		<span> {{ error }} </span>
+                		{% endfor %}
+                	</div>
+                {% else %}
+     
+                	{{ form.image(class="form-control", type="file") }}
+                
+                {% endif %}
+            </div>
+        </fieldset>
+        <div class="form-group mt-2">
+            {{ form.submit(class="btn btn-info") }}
+        </div>
+    </form>
+</div>
+{% endblock content %}

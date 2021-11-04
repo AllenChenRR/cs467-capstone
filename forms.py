@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from flask_wtf.file import FileField, FileRequired
+from wtforms import StringField, PasswordField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 # This class was built with the assistance of the following tutorial: 
 # "Python Flask Tutorial: Full-Featured Web App Part 3 - Forms and User Input"
@@ -33,3 +34,13 @@ class AccountForm(FlaskForm):
     def validate_new_password(form, field):
         if field.data and not (len(field.data) >= 4):
             raise ValidationError("Password must be at least 4 characters")
+
+class AddPetForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired(), Length(min=2, max=20)])
+    animal_type = SelectField('Animal Type', choices=[('cat', 'Cat'), ('dog', 'Dog'), ('other', 'Other')])
+    breed = StringField('Breed', validators=[DataRequired(), Length(min=2, max=20)])
+    disposition = SelectField('Disposition', choices=[('friendly', 'Friendly'), ('timid', 'Timid'), ('anxious', 'Anxious')])
+    availability = SelectField('Availability', choices=[('available', 'Available'), ('pending', 'Pending'), ('adopted', 'Adopted')])
+    description = StringField('Description', validators=[DataRequired()])
+    image = FileField('Image')
+    submit = SubmitField('Submit')

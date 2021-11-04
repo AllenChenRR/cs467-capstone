@@ -11,7 +11,7 @@ from flask import Flask, jsonify, redirect, request, session, render_template, f
 import password as pw
 import usermodel as model
 import traceback
-from forms import RegistrationForm, LoginForm, AccountForm
+from forms import RegistrationForm, LoginForm, AccountForm, AddPetForm
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -259,9 +259,21 @@ def logout():
     return redirect(url_for('home'))
 
 @app.route('/browse-pets', methods=['GET'])
-
 def browse_pets():
     return render_template('browse-pets.html', title="Browse Available Pets")
+
+@app.route('/add-pet', methods=['GET', 'POST'])
+def add_pet():
+    """
+    Adds a new pet to the database.
+    """
+    form = AddPetForm()
+    if form.validate_on_submit():
+        print('success')
+    else:
+        print(form.errors)
+    
+    return render_template('add-pet.html', title="Add a Pet to the Shelter", form=form)
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
