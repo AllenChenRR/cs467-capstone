@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
-from wtforms import StringField, PasswordField, SubmitField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 # This class was built with the assistance of the following tutorial: 
 # "Python Flask Tutorial: Full-Featured Web App Part 3 - Forms and User Input"
@@ -41,6 +41,6 @@ class AddPetForm(FlaskForm):
     breed = StringField('Breed', validators=[DataRequired(), Length(min=2, max=20)])
     disposition = SelectField('Disposition', choices=[('friendly', 'Friendly'), ('timid', 'Timid'), ('anxious', 'Anxious')])
     availability = SelectField('Availability', choices=[('available', 'Available'), ('pending', 'Pending'), ('adopted', 'Adopted')])
-    description = StringField('Description', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[DataRequired()])
     image = FileField('Image')
     submit = SubmitField('Submit')
