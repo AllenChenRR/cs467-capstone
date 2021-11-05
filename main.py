@@ -8,18 +8,25 @@
 from datetime import datetime
 from firebase_admin import credentials, firestore, initialize_app
 from flask import Flask, jsonify, redirect, request, session, render_template, flash, url_for
+import helpers as h
 import password as pw
-import usermodel as model
+import models
 import traceback
 from forms import RegistrationForm, LoginForm, AccountForm, AddPetForm
+from google.cloud import storage
+import os
 
 # Initialize Flask app
 app = Flask(__name__)
 
+UPLOAD_FOLDER = f'{app.root_path}/uploads'
+
 # Set secret key for sessions
 app.secret_key = "sdkfjDCVBsdjKkl%@%23$"
-
-# wtf form file
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['BUCKET'] = "cs467-group-app.appspot.com"
+app.config['STORAGE_URL'] = "https://storage.googleapis.com"
+app.config['PETS'] = 'Pets'
 # app.config['SECRET_KEY'] = '1f126886d424206b9b80a69066bf3f8f'
 
 # Initialize Firestore DB
@@ -27,10 +34,18 @@ app.secret_key = "sdkfjDCVBsdjKkl%@%23$"
 cred = credentials.Certificate('key.json') # jamie's db
 default_app = initialize_app(cred)
 db = firestore.client()
-
-
+storage_client = storage.Client()
+bucket = storage_client.bucket(app.config['BUCKET'])
 ####################################################################
 # public methods
+def add_new_pet(form):
+    """
+    Adds a new pet to the database
+    """
+    data = _format_pet_data(form)
+    return _add_document("Pets", data)
+
+
 def get_user_by_email(email):
     """
     Returns a user data dictionary 
@@ -88,7 +103,6 @@ def _get_document(collection, email=None, doc_id=None):
         query_ref = collection_ref.document(doc_id)
         if query_ref:
             return query_ref.get()
-
     return None
 
 def _get_document_data(document):
@@ -137,6 +151,28 @@ def _set_session(data):
     Updates session data with user data after an update.
     """
     session['user'] = data
+
+def _format_pet_data(form):
+    """
+    Transforms the form data to a form that can be uploaded to the database
+    """
+    data = {
+        "name": form.name.data,
+        "animal_type": form.animal_type.data,
+        "breed": form.breed.data,
+        "disposition": form.disposition.data,
+        "availability": form.availability.data,
+        "description": form.description.data,
+        "last_update": datetime.now()}
+
+    return data
+
+def _add_document(collection, data):
+    """
+    Add collection document in Firestore
+    """
+    doc_ref = db.collection(collection).add(data)
+    return doc_ref[1].id
 #####################################################################
 
 @app.route("/", methods=['GET'])
@@ -237,7 +273,7 @@ def login():
                 last_name = user_dict['last_name']
                 is_admin = user_dict['is_admin']
                 if pw.is_valid_password(salt, login_user_pw, hash):
-                    user_obj = model.User(email, first_name, last_name, 
+                    user_obj = models.User(email, first_name, last_name, 
                                           is_admin)
                     session['user'] = user_obj.__dict__
                     session['user']['id'] = user.id 
@@ -268,12 +304,25 @@ def add_pet():
     Adds a new pet to the database.
     """
     form = AddPetForm()
+    # create uploads folder if doesnt exist
+    if not os.path.exists('uploads'):
+        os.makedirs('uploads')
     if form.validate_on_submit():
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'],
+                                  form.image.data.filename)
+        pet_id = add_new_pet(form)
+
+        form.image.data.save(image_path)
+        blob = bucket.blob(pet_id)
+        blob.upload_from_filename(image_path)
+        blob.make_public()
+
         print('success')
+        os.remove(image_path)
     else:
         print(form.errors)
-    
     return render_template('add-pet.html', title="Add a Pet to the Shelter", form=form)
+
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)

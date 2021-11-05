@@ -5,3 +5,5 @@ handlers:
   script: auto
 
 
+env_variables:
+  CLOUD_STORAGE_BUCKET: cs467-group-app.appspot.com
