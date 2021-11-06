@@ -5,6 +5,7 @@
 # Notes and other useful things
 # https://stackoverflow.com/questions/11556958/sending-data-from-html-form-to-a-python-script-in-flask
 
+# cs-493-assignment-1-327013
 from datetime import datetime
 
 from werkzeug.datastructures import MIMEAccept
@@ -24,14 +25,17 @@ app = Flask(__name__)
 
 # Set secret key for sessions
 app.secret_key = "sdkfjDCVBsdjKkl%@%23$"
-app.config['BUCKET'] = "cs467-group-app.appspot.com"
+# app.config['BUCKET'] = "cs467-group-app.appspot.com" # jamies bucket
+app.config['BUCKET'] = "cs-493-assignment-1-327013.appspot.com" # new test bucket
+# app.config['BUCKET'] = 'cs467-capstone-chenall.appspot.com'
 app.config['STORAGE_URL'] = "https://storage.googleapis.com"
 app.config['PETS'] = 'Pets'
 # app.config['SECRET_KEY'] = '1f126886d424206b9b80a69066bf3f8f'
 
 # Initialize Firestore DB
 # cred = credentials.Certificate('serviceAccountKey.json')
-cred = credentials.Certificate('key.json') # jamie's db
+# cred = credentials.Certificate('key.json') # jamie's db
+cred = credentials.Certificate('testDeployKey.json') # jamie's db
 default_app = initialize_app(cred)
 db = firestore.client()
 storage_client = storage.Client()
