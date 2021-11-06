@@ -6,6 +6,8 @@
 # https://stackoverflow.com/questions/11556958/sending-data-from-html-form-to-a-python-script-in-flask
 
 from datetime import datetime
+
+from werkzeug.datastructures import MIMEAccept
 from firebase_admin import credentials, firestore, initialize_app
 from flask import Flask, jsonify, redirect, request, session, render_template, flash, url_for
 import helpers as h
@@ -19,11 +21,9 @@ import os
 # Initialize Flask app
 app = Flask(__name__)
 
-UPLOAD_FOLDER = f'{app.root_path}/uploads'
 
 # Set secret key for sessions
 app.secret_key = "sdkfjDCVBsdjKkl%@%23$"
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['BUCKET'] = "cs467-group-app.appspot.com"
 app.config['STORAGE_URL'] = "https://storage.googleapis.com"
 app.config['PETS'] = 'Pets'
@@ -304,24 +304,18 @@ def add_pet():
     Adds a new pet to the database.
     """
     form = AddPetForm()
-    # create uploads folder if doesnt exist
-    if not os.path.exists('uploads'):
-        os.makedirs('uploads')
     if form.validate_on_submit():
-        image_path = os.path.join(app.config['UPLOAD_FOLDER'],
-                                  form.image.data.filename)
         pet_id = add_new_pet(form)
-
-        form.image.data.save(image_path)
+        # creates a blob with pet_id as the name
         blob = bucket.blob(pet_id)
-        blob.upload_from_filename(image_path)
+        blob.upload_from_file(form.image.data, rewind=True, 
+                              content_type = 'image/jpeg')
         blob.make_public()
-
         print('success')
-        os.remove(image_path)
     else:
         print(form.errors)
     return render_template('add-pet.html', title="Add a Pet to the Shelter", form=form)
+
 
 
 if __name__ == '__main__':
