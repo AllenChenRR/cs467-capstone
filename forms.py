@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileRequired
+from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 # This class was built with the assistance of the following tutorial: 
@@ -42,5 +42,6 @@ class AddPetForm(FlaskForm):
     disposition = SelectField('Disposition', choices=[('friendly', 'Friendly'), ('timid', 'Timid'), ('anxious', 'Anxious')])
     availability = SelectField('Availability', choices=[('available', 'Available'), ('pending', 'Pending'), ('adopted', 'Adopted')])
     description = TextAreaField('Description', validators=[DataRequired()])
-    image = FileField('Image')
+    image = FileField('Image', validators=[FileRequired(), FileAllowed(['png', 'jpeg', 'jpg'], "Invalid image format!")
+    ])
     submit = SubmitField('Submit')

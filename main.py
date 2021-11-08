@@ -25,8 +25,8 @@ app = Flask(__name__)
 
 # Set secret key for sessions
 app.secret_key = "sdkfjDCVBsdjKkl%@%23$"
-# app.config['BUCKET'] = "cs467-group-app.appspot.com" # jamies bucket
-app.config['BUCKET'] = "cs-493-assignment-1-327013.appspot.com" # new test bucket
+app.config['BUCKET'] = "cs467-group-app.appspot.com" # jamies bucket
+#app.config['BUCKET'] = "cs-493-assignment-1-327013.appspot.com" # new test bucket
 # app.config['BUCKET'] = 'cs467-capstone-chenall.appspot.com'
 app.config['STORAGE_URL'] = "https://storage.googleapis.com"
 app.config['PETS'] = 'Pets'
