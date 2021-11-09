@@ -57,6 +57,14 @@ def add_new_pet(form):
     return _add_document("Pets", data)
 
 
+def update_pet_image_id(pet_id):
+    """
+    Updates the image attribute of an existing pet in the database
+    """
+    data = {"image": f"https://storage.googleapis.com/cs467-group-app.appspot.com/{pet_id}"}
+    _set_document("Pets", data, doc_id=pet_id, merge=True)
+
+
 def get_user_by_email(email):
     """
     Returns a user data dictionary 
@@ -147,12 +155,15 @@ def _format_user_data(form, user_id=None, new_user=False):
     data["hash"] = hash_result[1]
     return data
 
-def _set_document(collection, data, doc_id=None):
+def _set_document(collection, data, doc_id=None, merge=False):
     """
     Add or update collection document in Firestore
     """
+    
     doc_ref = db.collection(collection)
-    if doc_id:
+    if doc_id and merge:
+        doc_ref.document(doc_id).set(data, merge=True)
+    elif doc_id:
         doc_ref.document(doc_id).set(data)
     else:
         doc_ref.document().set(data)
@@ -174,7 +185,8 @@ def _format_pet_data(form):
         "disposition": form.disposition.data,
         "availability": form.availability.data,
         "description": form.description.data,
-        "last_update": datetime.now()}
+        "last_update": datetime.now(),
+        "image": ""}
 
     return data
 
@@ -317,6 +329,7 @@ def add_pet():
     form = AddPetForm()
     if form.validate_on_submit():
         pet_id = add_new_pet(form)
+        update_pet_image_id(pet_id)
         # creates a blob with pet_id as the name
         blob = bucket.blob(pet_id)
         blob.upload_from_file(form.image.data, rewind=True, 
