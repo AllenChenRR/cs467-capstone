@@ -22,6 +22,12 @@ import os
 # Initialize Flask app
 app = Flask(__name__)
 
+# If you don't specify credentials when constructing the client, the
+# client library will look for credentials in the environment.
+# https://cloud.google.com/docs/authentication/getting-started for more information
+# If you don't have the authentication file set to an environment variable,
+# then leave the following uncommented.
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="key.json"
 
 # Set secret key for sessions
 app.secret_key = "sdkfjDCVBsdjKkl%@%23$"
@@ -41,13 +47,6 @@ db = firestore.client()
 storage_client = storage.Client()
 bucket = storage_client.bucket(app.config['BUCKET'])
 
-
-# If you don't specify credentials when constructing the client, the
-# client library will look for credentials in the environment.
-# https://cloud.google.com/docs/authentication/getting-started for more information
-# If you don't have the authentication file set to an environment variable,
-# then leave the following uncommented.
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]='key.json'
 ####################################################################
 # public methods
 def add_new_pet(form):
