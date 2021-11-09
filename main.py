@@ -57,11 +57,11 @@ def add_new_pet(form):
     return _add_document("Pets", data)
 
 
-def update_pet_image_id(pet_id):
+def update_pet_image(pet_id):
     """
     Updates the image attribute of an existing pet in the database
     """
-    data = {"image": f"https://storage.googleapis.com/cs467-group-app.appspot.com/{pet_id}"}
+    data = {"image": h.get_image_url(app, pet_id)}
     _set_document("Pets", data, doc_id=pet_id, merge=True)
 
 
@@ -329,7 +329,7 @@ def add_pet():
     form = AddPetForm()
     if form.validate_on_submit():
         pet_id = add_new_pet(form)
-        update_pet_image_id(pet_id)
+        update_pet_image(pet_id)
         # creates a blob with pet_id as the name
         blob = bucket.blob(pet_id)
         blob.upload_from_file(form.image.data, rewind=True, 
