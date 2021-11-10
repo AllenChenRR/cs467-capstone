@@ -32,6 +32,34 @@ def update_pet_image(app, db, pet_id):
     data = {"image": h.get_image_url(app, pet_id)}
     _set_document(db, "Pets", data, doc_id=pet_id, merge=True)
 
+def get_pet_by_id(db, doc_id):
+    """
+    Returns a pet data dictionary 
+    """
+    document = _get_document(db, "Pets", doc_id=doc_id)
+    return _get_document_data(document)
+
+def browse_pets(db, pet_type=None):
+    """
+    Returns a list of dictionaries, one per pet for the given pet_type.
+    If no pet_type is given, it will returns a list of dictionaries, 
+    one per pet for all pets in the database.
+    """
+    query = None
+    pets_list = []
+    pets = db.collection("Pets")
+    
+    if pet_type:
+        query = pets.where("animal_type", "==", pet_type)
+        
+    if query:  
+        pets_list = list(query.stream())
+    else:
+        pets_list =  list(pets.stream())
+
+    pet_data = list(map(_get_document_data, pets_list))
+    pet_data.sort(key=lambda x: x["last_update"], reverse=True)
+    return pet_data
 
 def get_user_by_email(db, email):
     """

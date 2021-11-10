@@ -185,7 +185,15 @@ def logout():
 
 @app.route('/browse-pets', methods=['GET'])
 def browse_pets():
-    return render_template('browse-pets.html', title="Browse Available Pets")
+    
+    # pet_type will come from a form. It will be dog, cat, other or None. 
+    # If it is None, all pets will be returned.
+    pet_type = "other"
+    
+    pets = h.browse_pets(db, pet_type)
+    if not pets:
+        pets = [f"Sorry, there are no {pet_type}s to display"]
+    return render_template('browse-pets.html', title="Browse Available Pets", pets=pets)
 
 @app.route('/add-pet', methods=['GET', 'POST'])
 def add_pet():
@@ -208,21 +216,26 @@ def add_pet():
     return render_template('add-pet.html', title="Add a Pet to the Shelter", form=form)
 
 @app.route('/pets/<id>', methods=['GET'])
-def get_pet_by_id(id):
+def get_pet(id):
+    # I changed the name of this sine it was the same as a helper function
+    
+    pet_data = h.get_pet_by_id(db, id)
+    
+    # 
     # This is sample pet data that can be deleted. 
     # We can instead query the DB using the pet id and grab the info from there
-    pet_data = {
-        "name": "Rosie",
-        "type": "Cat",
-        "breed": "Mixed",
-        "age": 7,
-        "availability": "Available",
-        "disposition": "Timid",
-        "date_created": "2021-11-02",
-        "description": "Rosie is a doll! This sweet girl " +
-        "loves spending time with her family so much that she can be stressed in their absence" + 
-        " For this reason, she's hoping to meet a kindhearted family that's home often."
-    }
+    # pet_data = {
+    #     "name": "Rosie",
+    #     "type": "Cat",
+    #     "breed": "Mixed",
+    #     "age": 7,
+    #     "availability": "Available",
+    #     "disposition": "Timid",
+    #     "date_created": "2021-11-02",
+    #     "description": "Rosie is a doll! This sweet girl " +
+    #     "loves spending time with her family so much that she can be stressed in their absence" + 
+    #     " For this reason, she's hoping to meet a kindhearted family that's home often."
+    # }
     return render_template('pet-profile.html', pet_data=pet_data)
 
 if __name__ == '__main__':
