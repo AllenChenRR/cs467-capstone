@@ -35,6 +35,7 @@ app.config['BUCKET'] = "cs467-group-app.appspot.com" # jamies bucket
 #app.config['BUCKET'] = "cs-493-assignment-1-327013.appspot.com" # new test bucket
 # app.config['BUCKET'] = 'cs467-capstone-chenall.appspot.com'
 app.config['STORAGE_URL'] = "https://storage.googleapis.com"
+app.config['USERS'] = 'Users'
 app.config['PETS'] = 'Pets'
 # app.config['SECRET_KEY'] = '1f126886d424206b9b80a69066bf3f8f'
 
@@ -47,156 +48,6 @@ db = firestore.client()
 storage_client = storage.Client()
 bucket = storage_client.bucket(app.config['BUCKET'])
 
-####################################################################
-# public methods
-def add_new_pet(form):
-    """
-    Adds a new pet to the database
-    """
-    data = _format_pet_data(form)
-    return _add_document("Pets", data)
-
-
-def update_pet_image(pet_id):
-    """
-    Updates the image attribute of an existing pet in the database
-    """
-    data = {"image": h.get_image_url(app, pet_id)}
-    _set_document("Pets", data, doc_id=pet_id, merge=True)
-
-
-def get_user_by_email(email):
-    """
-    Returns a user data dictionary 
-    """
-    document = _get_document("Users", email=email)
-    return _get_document_data(document)
-
-def get_user_by_id(doc_id):
-    """
-    Returns a user data dictionary 
-    """
-    document = _get_document("Users", doc_id=doc_id)
-    return _get_document_data(document)
-
-def get_salt_and_hash(doc_id):
-    """
-    Returns document salt and hash values as a tuple.
-    """
-    doc = get_user_by_id(doc_id)
-    return (doc["salt"], doc["hash"])
-
-def add_user(form):
-    """
-    Adds a new user to the database
-    """
-    data = _format_user_data(form, new_user=True)
-    _set_document("Users", data)
-
-def update_user(form, user_id):
-    """
-    Updates an existing user in the database
-    """
-    data = _format_user_data(form, user_id)
-    _set_document("Users", data, doc_id=user_id)
-    
-    # remove salt and hash to update session
-    del data['salt']
-    del data['hash']
-    data['id'] = user_id
-    _set_session(data)
-#######################################################################
-# helper methods
-def _get_document(collection, email=None, doc_id=None):
-    """
-    Returns a collection document or None
-    """
-    collection_ref = db.collection(collection)
-    if email:
-        query_ref = collection_ref.where('email', '==', email)
-        # There should only be one match
-        result_stream = list(query_ref.stream())
-        if len(result_stream) == 1:
-            return result_stream[0]
-    elif doc_id:
-        query_ref = collection_ref.document(doc_id)
-        if query_ref:
-            return query_ref.get()
-    return None
-
-def _get_document_data(document):
-    """
-    Returns a dictionary of the collection document attributes or None.
-    """
-    document_data = None
-    if document:
-        document_data = document.to_dict()
-        document_data['id'] = document.id
-    return document_data
-
-def _format_user_data(form, user_id=None, new_user=False):
-    """
-    Transforms the form data to a form that can be uploaded to the database
-    """
-    data = {
-        "first_name": form.first_name.data,
-        "last_name": form.last_name.data,
-        "email": form.email.data,
-        "is_admin": False,
-        "last_update": datetime.now()}
-
-    if isinstance(form, AccountForm) and form.new_password.data:
-        password = form.new_password.data
-    else:
-        password = form.password.data
-
-    hash_result = pw.return_salt_hash(password) 
-    data["salt"] = hash_result[0]
-    data["hash"] = hash_result[1]
-    return data
-
-def _set_document(collection, data, doc_id=None, merge=False):
-    """
-    Add or update collection document in Firestore
-    """
-    
-    doc_ref = db.collection(collection)
-    if doc_id and merge:
-        doc_ref.document(doc_id).set(data, merge=True)
-    elif doc_id:
-        doc_ref.document(doc_id).set(data)
-    else:
-        doc_ref.document().set(data)
-
-def _set_session(data):
-    """
-    Updates session data with user data after an update.
-    """
-    session['user'] = data
-
-def _format_pet_data(form):
-    """
-    Transforms the form data to a form that can be uploaded to the database
-    """
-    data = {
-        "name": form.name.data,
-        "animal_type": form.animal_type.data,
-        "breed": form.breed.data,
-        "disposition": form.disposition.data,
-        "availability": form.availability.data,
-        "description": form.description.data,
-        "last_update": datetime.now(),
-        "image": ""}
-
-    return data
-
-def _add_document(collection, data):
-    """
-    Add collection document in Firestore
-    """
-    doc_ref = db.collection(collection).add(data)
-    return doc_ref[1].id
-#####################################################################
 
 @app.route("/", methods=['GET'])
 @app.route("/home")
@@ -213,12 +64,12 @@ def signup():
     if form.validate_on_submit():
         try:
             # Check if the email is already in the database.
-            if get_user_by_email(form.email.data):
+            if h.get_user_by_email(db, form.email.data):
                 flash(f'Email { form.email.data } is already in use.', 'danger')
                 return render_template("signup.html", title="Sign Up", form=form)
 
             # Add a new user to the database.
-            add_user(form)
+            h.add_user(db, form)
 
             # Logs current user out if new registration occurs
             if 'user' in session:
@@ -251,14 +102,14 @@ def user_account():
                 user_id = session['user']['id']
 
                 # Check if the email is already in use
-                user = get_user_by_email(form.email.data)
+                user = h.get_user_by_email(db, form.email.data)
                 if user and user["id"] != user_id:
                     flash(f'Email { form.email.data } is already in use.', 'danger')
                     return redirect('/account')
 
-                salt, hash = get_salt_and_hash(user_id)
+                salt, hash = h.get_salt_and_hash(db, user_id)
                 if pw.is_valid_password(salt, form.password.data, hash):
-                    update_user(form, user_id)
+                    h.update_user(db, form, user_id)
                     flash('Update successful!', 'success')
                 else:
                     flash('Invalid password. Please try again.', 'danger')
@@ -328,13 +179,14 @@ def add_pet():
     """
     form = AddPetForm()
     if form.validate_on_submit():
-        pet_id = add_new_pet(form)
-        update_pet_image(pet_id)
+        pet_id = h.add_new_pet(db, form)
+        h.update_pet_image(app, db, pet_id)
         # creates a blob with pet_id as the name
         blob = bucket.blob(pet_id)
         blob.upload_from_file(form.image.data, rewind=True, 
                               content_type = 'image/jpeg')
         blob.make_public()
+        print(pet_id)
         print('success')
     else:
         print(form.errors)
