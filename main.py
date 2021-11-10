@@ -192,7 +192,23 @@ def add_pet():
         print(form.errors)
     return render_template('add-pet.html', title="Add a Pet to the Shelter", form=form)
 
-
+@app.route('/pets/<id>', methods=['GET'])
+def get_pet_by_id(id):
+    # This is sample pet data that can be deleted. 
+    # We can instead query the DB using the pet id and grab the info from there
+    pet_data = {
+        "name": "Rosie",
+        "type": "Cat",
+        "breed": "Mixed",
+        "age": 7,
+        "availability": "Available",
+        "disposition": "Timid",
+        "date_created": "2021-11-02",
+        "description": "Rosie is a doll! This sweet girl " +
+        "loves spending time with her family so much that she can be stressed in their absence" + 
+        " For this reason, she's hoping to meet a kindhearted family that's home often."
+    }
+    return render_template('pet-profile.html', pet_data=pet_data)
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)

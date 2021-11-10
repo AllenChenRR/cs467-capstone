@@ -1,0 +1,39 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-5 mx-auto">
+    <h2 class="text-center"> Animal Info </h2>
+    <div class="container mx-auto">
+        <div class="row">
+            <div class="col-5">
+                <img src="{{ url_for('static', filename='images/image02.jpeg') }}" alt="A picture of a cat." class="img-thumbnail">
+                <p class="lead text-center">Say hello to {{ pet_data.name }}! Will you adopt them today?</p>
+            </div>
+            <div class="col-7">
+                <!-- Inner table for pet data begins here -->
+                {% for key, value in pet_data.items() %}
+                <!-- Creates a row of two columns with the key and value displayed-->
+                <div class="row">
+                    <div class="col-3">
+                        {% if key == "date_created" %}
+                        <!-- Changes the "date_created" key to "here since "-->
+                        <p class="text-info"><strong> here since </strong></p>
+                        {% else %}
+                        <p class="text-info"><strong>{{ key }} </strong></p>
+                        {% endif %}
+                    </div>
+                    <div class="col-8">
+                        <p class="text-left">{{ value }}</p>
+                    </div>
+                </div>
+                {% endfor %} 
+                {% if session["user"] and session["user"]["is_admin"] == true %}
+                <p class="text-left mt-2">
+                    <a href="/" class="btn btn-info">Update Pet Info</a>
+                </p>
+                {% endif %}
+                <!-- Inner table with pet data ends here-->
+            </div>
+        </div>
+    </div>
+
+
+    {% endblock content %}
