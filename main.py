@@ -73,7 +73,7 @@ def signup():
 
             # Add a new user to the database.
             h.add_user(db, form)
-
+            # Login the user after they are registered in the database
             users = db.collection('Users').where('email', '==', form.email.data)\
                                  .stream()
             for user in users:
