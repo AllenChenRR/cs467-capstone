@@ -32,12 +32,10 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="key.json"
 # Set secret key for sessions
 app.secret_key = "sdkfjDCVBsdjKkl%@%23$"
 app.config['BUCKET'] = "cs467-group-app.appspot.com" # jamies bucket
-#app.config['BUCKET'] = "cs-493-assignment-1-327013.appspot.com" # new test bucket
 # app.config['BUCKET'] = 'cs467-capstone-chenall.appspot.com'
 app.config['STORAGE_URL'] = "https://storage.googleapis.com"
 app.config['USERS'] = 'Users'
 app.config['PETS'] = 'Pets'
-# app.config['SECRET_KEY'] = '1f126886d424206b9b80a69066bf3f8f'
 
 # Initialize Firestore DB
 # cred = credentials.Certificate('serviceAccountKey.json')
@@ -58,8 +56,13 @@ def home():
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     """
-    Add a new user ot the database
+    Add a new user to the database
     """
+        # Logs current user out if new registration occurs
+    if 'user' in session:
+        error_message = "You are already logged in. Please log out first to create a new account."
+        return render_template("error.html", error_message=error_message)
+
     form = RegistrationForm()
     if form.validate_on_submit():
         try:
@@ -71,12 +74,24 @@ def signup():
             # Add a new user to the database.
             h.add_user(db, form)
 
-            # Logs current user out if new registration occurs
-            if 'user' in session:
-                session.pop('user', None)
+            users = db.collection('Users').where('email', '==', form.email.data)\
+                                 .stream()
+            for user in users:
+                user_dict = user.to_dict()
+                email = user_dict['email']
+                salt = user_dict['salt']
+                hash = user_dict['hash']
+                first_name = user_dict['first_name']
+                last_name = user_dict['last_name']
+                is_admin = user_dict['is_admin']
+                if pw.is_valid_password(salt, form.password.data, hash):
+                    user_obj = models.User(email, first_name, last_name, 
+                                          is_admin)
+                    session['user'] = user_obj.__dict__
+                    session['user']['id'] = user.id 
 
-            flash(f'Account created for { form.email.data }', 'success')
-            return redirect(url_for('home'))
+                flash(f'Account created for { form.email.data }', 'success')
+                return redirect(url_for('home'))
         
         except Exception as e:
             return f"An Error Occured: {e}"
