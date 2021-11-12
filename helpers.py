@@ -61,6 +61,26 @@ def browse_pets(db, pet_type=None):
     pet_data.sort(key=lambda x: x["last_update"], reverse=True)
     return pet_data
 
+def search_pets(db, attribute_dict):
+    # attribute_dict will be a form
+    # TODO create a function reads a form and puts it into a dict
+    attribute_dict = {"name": "The Notorious P.I.G."}
+    pets_ref = db.collection("Pets")
+    pets_query = ["pets_ref"]
+    for k, v in attribute_dict.items():
+        pets_query.append(f".where('{k}', '==', '{v}')")
+    pets_query_str = "".join(pets_query)
+    result = eval(pets_query_str)
+    for match in result.stream():
+        print(match.id)
+
+
+def delete_pet(db, pet_id):
+    """ 
+    Deletes an animal's data from the database
+    """
+    db.collection("Pets").document(pet_id).delete()
+
 def get_user_by_email(db, email):
     """
     Returns a user data dictionary 
@@ -125,7 +145,7 @@ def _get_document_data(document):
     Returns a dictionary of the collection document attributes or None.
     """
     document_data = None
-    if document:
+    if document.exists:
         document_data = document.to_dict()
         document_data['id'] = document.id
     return document_data
