@@ -25,12 +25,11 @@
                         <p class="text-left">{{ value }}</p>
                     </div>
                 </div>
-                {% endfor %} 
-                {% if session["user"] and session["user"]["is_admin"] == true %}
-                <p class="text-left mt-2">
-                    <a href="/" class="btn btn-info">Update Pet Info</a>
+                {% endfor %}
+                <p class="text-left mt-2 ml-4">
+                    <a href="/" class="btn btn-info"> Update Pet Info</a>
+                    <a href="/" class="btn btn-danger"> Delete Pet</a>
                 </p>
-                {% endif %}
                 <!-- Inner table with pet data ends here-->
             </div>
         </div>
