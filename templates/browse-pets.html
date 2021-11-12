@@ -1,23 +1,33 @@
-{% extends "base.html" %} {% block content %}
-<div class="container mt-4 text-center mx-auto">
-    <h1>Browse Available Pets</h1>
+{% extends "base.html" %} 
+{% block content %}
+<div class="container mt-4 mx-auto">
+    <h1 class="text-center">Browse Available Pets</h1>
     <div class="w-75 mx-auto container">
-        <p class="lead">These are the pets we currently have available for adoption. </p>
-    
-    
-            <!-- This is a diplay for testing only. Can be removed when code is merged. -->
+        <p class="lead text-center">These are the pets we currently have available for adoption. </p>
+        <div class="row p-2">
             {% for pet in pets %}
-            <tr>
-                <td>{{pet}}</td>
-                <br>
-                <br>
-            </tr>
+            <div class="col-3 mb-4">
+                <div class="card h-100 bg-secondary">
+                    <div class="card-body">
+                        <div class="text-center">
+                            <img class="card-img-top img-fluid mx-auto" src="{{ pet.image }}" style="max-width:80%;max-height: fit-content">
+                        </div>
+                        <h5 class="card-title mt-3 text-center">{{ pet.name }}</h5>
+                        <p class="card-text">
+                            <span class="text-info">Breed</span> {{ pet.name }}
+                            <br><span class="text-info">Animal Type:</span> {{ pet.animal_type}}
+                            <br><span class="text-info">Availability:</span> {{ pet.availability}}
+                            <div class="text-center">
+                                <p><a class="btn btn-primary btn-sm" href="/pets/{{ pet.id }}">Learn More</a></p>
+                            </div>
+                        </p>
+                    </div>
+                </div>
+            </div>
             {% endfor %}
-            <!--  -->
-    
-    
-    
+        </div>
     </div>
+</div>
 </div>
 
 
