@@ -8,7 +8,16 @@ import helpers as h
 import password as pw
 
 
-
+def create_default_list(default:str, 
+                        arr:"list[tuple(str, str)]"
+                        ) -> "list[tuple(str, str)]":
+    """Creates a new form field choices list with default value as first element
+    """
+    for i in range(len(arr)):
+        if default.lower() == arr[i][0]:
+            arr.insert(0, arr.pop(i))
+            return arr
+    
 
 def get_image_url(app, id):
     return os.path.join(

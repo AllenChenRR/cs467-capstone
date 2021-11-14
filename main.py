@@ -15,7 +15,7 @@ import helpers as h
 import password as pw
 import models
 import traceback
-from forms import RegistrationForm, LoginForm, AccountForm, AddPetForm
+from forms import EditPetForm, RegistrationForm, LoginForm, AccountForm, AddPetForm
 from google.cloud import storage
 import os
 
@@ -27,25 +27,33 @@ app = Flask(__name__)
 # https://cloud.google.com/docs/authentication/getting-started for more information
 # If you don't have the authentication file set to an environment variable,
 # then leave the following uncommented.
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="key.json"
+# os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="key.json" ##1
 
 # Set secret key for sessions
 app.secret_key = "sdkfjDCVBsdjKkl%@%23$"
 app.config['BUCKET'] = "cs467-group-app.appspot.com" # jamies bucket
-# app.config['BUCKET'] = 'cs467-capstone-chenall.appspot.com'
+# app.config['BUCKET'] = 'cs467-capstone-chenall.appspot.com' # Allen's bucket
+#app.config['BUCKET'] = "cs-493-assignment-1-327013.appspot.com" # new test bucket
+
+
 app.config['STORAGE_URL'] = "https://storage.googleapis.com"
 app.config['USERS'] = 'Users'
 app.config['PETS'] = 'Pets'
 
 # Initialize Firestore DB
-# cred = credentials.Certificate('serviceAccountKey.json')
-cred = credentials.Certificate('key.json') # jamie's db
+# cred = credentials.Certificate('serviceAccountKey.json') # Allen's key
+cred = credentials.Certificate('key.json') # jamie's db ##3
 # cred = credentials.Certificate('testDeployKey.json') # jamie's db
 default_app = initialize_app(cred)
 db = firestore.client()
 storage_client = storage.Client()
 bucket = storage_client.bucket(app.config['BUCKET'])
-
+DISPOSITIONS = ["good with children", "good with other animals",  
+                "animal must be leashed at all times"]
+CAT_BREEDS = [("maine coon", "Maine Coon") , ("siamese, Siamese"), ("other", "Other")]
+DOG_BREEDS = [("retriever", "Retriever"), ("bulldog", "Bulldog"), ("other", "Other")]
+ANIM_TYPES = [('cat', 'Cat'), ('dog', 'Dog'), ('other', 'Other')]
+AVAILABILITIES = [('available', 'Available'), ('pending', 'Pending'), ('adopted', 'Adopted')]
 
 @app.route("/", methods=['GET'])
 @app.route("/home")
@@ -201,18 +209,21 @@ def add_pet():
     Adds a new pet to the database.
     """
     form = AddPetForm()
-    if form.validate_on_submit():
-        pet_id = h.add_new_pet(db, form)
-        h.update_pet_image(app, db, pet_id)
-        # creates a blob with pet_id as the name
-        blob = bucket.blob(pet_id)
-        blob.upload_from_file(form.image.data, rewind=True, 
-                              content_type = 'image/jpeg')
-        blob.make_public()
-        print(pet_id)
-        print('success')
-    else:
-        print(form.errors)
+    if request.method == "POST":
+        if form.validate_on_submit():
+            pet_id = h.add_new_pet(db, form)
+            h.update_pet_image(app, db, pet_id)
+            # creates a blob with pet_id as the name
+            blob = bucket.blob(pet_id)
+            blob.upload_from_file(form.image.data, rewind=True, 
+                                content_type = 'image/jpeg')
+            blob.make_public()
+            print(pet_id)
+            # Prevents double post problem
+            flash(f'Pet {form.name.data} added successfully', 'success')
+            return redirect(url_for("add_pet"))
+        else:
+            print(f'Form errors: {form.errors}')
     return render_template('add-pet.html', title="Add a Pet to the Shelter", form=form)
 
 @app.route('/pets/<id>', methods=['GET', 'DELETE'])
@@ -238,5 +249,48 @@ def search():
     
     
     
+@app.route('/pets/<id>/edit', methods = ['GET', 'POST'])
+def edit_pet_by_id(id):
+
+    pet_data = {
+    "name": "Rosie1",
+    "type": "Other",
+    "breed": "Mixed",
+    "age": 7,
+    "availability": "Pending",
+    "disposition": ["Good with children", "Good with other animals"],
+    "date_created": "2021-11-02",
+    "description": "Rosie is a doll! This sweet girl " +
+    "loves spending time with her family so much that she can be stressed in their absence" + 
+    " For this reason, she's hoping to meet a kindhearted family that's home often."
+    }
+    
+
+    form = EditPetForm()
+
+    form.animal_type.choices = h.create_default_list(pet_data['type'], ANIM_TYPES)
+    form.availability.choices = h.create_default_list(pet_data['availability'], AVAILABILITIES)
+
+    if request.method == 'GET':
+        form.name.data =pet_data["name"]
+        form.animal_type.data = pet_data["type"]
+        form.breed.data = pet_data["breed"]
+        form.availability.data = pet_data["availability"]
+        form.disposition.data = pet_data["disposition"]
+        form.description.data = pet_data["description"]
+    elif request.method == 'POST':
+        try:
+            if form.validate_on_submit():
+                print(form.disposition.data)
+                print(form.availability.data)
+                print("validating works")
+                flash(f'Pet {form.name.data} updated successfully', 'success')
+                return redirect(url_for("edit_pet_by_id"))
+        except Exception as e:
+            traceback.print_exc()
+    return render_template('edit-pet.html',title = "Update pet content", 
+                            pet_data=pet_data, form = form)
+    
+
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)

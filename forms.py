@@ -1,11 +1,30 @@
+from re import UNICODE
+from typing import MutableMapping
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, SelectField, TextAreaField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms import widgets, StringField, PasswordField, SubmitField, SelectField, TextAreaField, SelectMultipleField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional
 # This class was built with the assistance of the following tutorial: 
 # "Python Flask Tutorial: Full-Featured Web App Part 3 - Forms and User Input"
 # Link: https://youtu.be/UIJKdCIEXUQ
 
+DISPOSITIONS = [("good with children","Good with children"), ("good with other animals", 
+                "Good with other animals"),  ("animal must be leashed at all times", 
+                "Animal must be leashed at all times")]
+CAT_BREEDS = [("maine coon", "Maine Coon") , ("siamese, Siamese"), ("other", "Other")]
+DOG_BREEDS = [("retriever", "Retriever"), ("bulldog", "Bulldog"), ("other", "Other")]
+ANIM_TYPES = [('cat', 'Cat'), ('dog', 'Dog'), ('other', 'Other')]
+AVAILABILITIES = [('available', 'Available'), ('pending', 'Pending'), ('adopted', 'Adopted')]
+
+
+# Widgets
+class MultiCheckboxField(SelectMultipleField):
+    widget = widgets.ListWidget(prefix_label = False)
+    option_widget = widgets.CheckboxInput()
+
+
+# Forms
+#---------------------------------------------------------------------------
 class RegistrationForm(FlaskForm):
     first_name = StringField('First Name', validators=[DataRequired(), Length(min=2, max=20)])
     last_name = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=20)])
@@ -39,9 +58,20 @@ class AddPetForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(min=2, max=20)])
     animal_type = SelectField('Animal Type', choices=[('cat', 'Cat'), ('dog', 'Dog'), ('other', 'Other')])
     breed = StringField('Breed', validators=[DataRequired(), Length(min=2, max=20)])
-    disposition = SelectField('Disposition', choices=[('friendly', 'Friendly'), ('timid', 'Timid'), ('anxious', 'Anxious')])
-    availability = SelectField('Availability', choices=[('available', 'Available'), ('pending', 'Pending'), ('adopted', 'Adopted')])
+    disposition = MultiCheckboxField('Disposition', choices=DISPOSITIONS)
+    availability = SelectField('Availability', choices=AVAILABILITIES)
     description = TextAreaField('Description', validators=[DataRequired()])
     image = FileField('Image', validators=[FileRequired(), FileAllowed(['png', 'jpeg', 'jpg'], "Invalid image format!")
     ])
     submit = SubmitField('Submit')
+
+class EditPetForm(FlaskForm):
+    name = StringField("Name",  validators=[Optional(False), DataRequired(), Length(min=2, max=20)]) 
+    animal_type = SelectField('Animal Type', choices=ANIM_TYPES)
+    breed = StringField('Breed', validators=[Optional(False), Length(min=2, max=20)])
+    disposition = MultiCheckboxField('Disposition', choices=DISPOSITIONS)
+    availability = SelectField('Availability', choices=AVAILABILITIES)
+    description = TextAreaField('Description')
+    image = FileField('Image', validators=[FileAllowed(['png', 'jpeg', 'jpg'], "Invalid image format!")])
+    submit = SubmitField("Update")
+    
