@@ -154,7 +154,7 @@ def _get_document_data(document):
     Returns a dictionary of the collection document attributes or None.
     """
     document_data = None
-    if document.exists:
+    if document and document.exists:
         document_data = document.to_dict()
         document_data['id'] = document.id
     return document_data
