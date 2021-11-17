@@ -49,7 +49,7 @@
                 	</div>
                 {% else %}
      
-                	{{ form.breed(class="form-control") }}
+                	{{ form.breed(class="form-select") }}
                 
                 {% endif %}
             </div>
@@ -123,4 +123,7 @@
         </div>
     </form>
 </div>
+{% block javascript %}
+    <script src="{{url_for('static', filename='scripts/loadbreeds.js')}}"></script>
+{% endblock %}
 {% endblock content %}

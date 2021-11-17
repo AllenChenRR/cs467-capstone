@@ -1,15 +1,24 @@
 from datetime import datetime
 import os
 
-from flask import Flask, jsonify, redirect, request, session, render_template, flash, url_for
-from forms import RegistrationForm, LoginForm, AccountForm, AddPetForm
+from flask import session
+from forms import AccountForm
 
 import helpers as h
 import password as pw
 
+CAT_BREEDS = [("maine coon", "Maine Coon"), ("siamese", "Siamese"), ("other", "Other")]
+DOG_BREEDS = [("retriever", "Retriever"), ("bulldog", "Bulldog"), ("other", "Other")]
+OTHER_BREEDS = [("other", "Other")]
 
-def create_default_list(default:str, 
-                        arr:"list[tuple(str, str)]"
+
+def update_pet(db, form, pet_id):
+    data = _format_pet_data(form)
+    _set_document(db, "Pets", data, doc_id=pet_id, merge=True)
+
+
+def create_default_list(default:str,
+                        arr: "list[tuple(str, str)]"
                         ) -> "list[tuple(str, str)]":
     """Creates a new form field choices list with default value as first element
     """
@@ -18,6 +27,26 @@ def create_default_list(default:str,
             arr.insert(0, arr.pop(i))
             return arr
     
+def populate_pet_form(form, pet_data):
+    form.name.data =pet_data["name"]
+    form.animal_type.data = pet_data["animal_type"]
+    form.breed.data = pet_data["breed"]
+    form.availability.data = pet_data["availability"]
+    form.disposition.data = pet_data["disposition"]
+    form.description.data = pet_data["description"]
+    return form
+
+def return_breed_choices(breed:str, type:str) -> "list[tuple(str, str)]":
+    """Returns breed choices based on animal type
+    """
+    if type.lower() == "cat":
+        return create_default_list(breed, CAT_BREEDS)
+    elif type.lower() == "dog":
+        return create_default_list(breed, DOG_BREEDS)
+    elif type.lower() == "other":
+        return create_default_list(breed, OTHER_BREEDS)
+    else:
+        return None
 
 def get_image_url(app, id):
     return os.path.join(
@@ -40,6 +69,7 @@ def update_pet_image(app, db, pet_id):
     """
     data = {"image": h.get_image_url(app, pet_id)}
     _set_document(db, "Pets", data, doc_id=pet_id, merge=True)
+
 
 def get_pet_by_id(db, doc_id):
     """
@@ -211,7 +241,7 @@ def _format_pet_data(form):
         "availability": form.availability.data,
         "description": form.description.data,
         "last_update": datetime.now(),
-        "image": ""}
+    }
 
     return data
 
@@ -220,4 +250,4 @@ def _add_document(db, collection, data):
     Add collection document in Firestore
     """
     doc_ref = db.collection(collection).add(data)
-    return doc_ref[1].id                  
+    return doc_ref[1].id

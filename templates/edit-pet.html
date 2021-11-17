@@ -56,7 +56,7 @@
                             {% endfor %}>
                         </div>
                     {% else %}
-                        {{form.breed(class="form-control", placeholder=pet_data['breed'])}}
+                        {{form.breed(class="form-select")}}
                     {% endif %}
                 </div>
 
@@ -116,5 +116,8 @@
     </div>
 
 </div>
-  
+
+{% block javascript %}
+    <script src="{{url_for('static', filename='scripts/loadbreeds.js')}}"></script>
+{% endblock %}
 {% endblock content %}
