@@ -4,33 +4,73 @@
     <div class="container mx-auto">
         <div class="row">
             <div class="col-5">
-                <!-- <img src="{{ url_for('static', filename='images/image02.jpeg') }}" alt="A picture of a cat." class="img-thumbnail"> -->
-                <img src="{{pet_data.image}}" alt="pet image" class="img-thumbnail">
+                <img src="{{pet_data.image}}" alt="pet image" class="img-thumbnail" style="max-width:90%;max-height: fit-content">
                 <p class="lead text-center">Say hello to {{ pet_data.name }}! Will you adopt them today?</p>
             </div>
-            <div class="col-7">
-                <!-- Inner table for pet data begins here -->
-                {% for key, value in pet_data.items() %}
-                <!-- Creates a row of two columns with the key and value displayed-->
+            <div class="col-7 mt-3">
                 <div class="row">
                     <div class="col-3">
-                        {% if key == "date_created" %}
-                        <!-- Changes the "date_created" key to "here since "-->
-                        <p class="text-info"><strong> here since </strong></p>
-                        {% else %}
-                        <p class="text-info"><strong>{{ key }} </strong></p>
-                        {% endif %}
+                        <p class="text-info"><strong>Name</strong></p>
+
                     </div>
                     <div class="col-8">
-                        <p class="text-left">{{ value }}</p>
+                        <p class="text-left">{{ pet_data.name }}</p>
                     </div>
                 </div>
-                {% endfor %}
+                <div class="row">
+                    <div class="col-3">
+                        <p class="text-info"><strong>Availability</strong></p>
+
+                    </div>
+                    <div class="col-8">
+                        <p class="text-left">{{ pet_data.availability }}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        <p class="text-info"><strong>Type</strong></p>
+
+                    </div>
+                    <div class="col-8">
+                        <p class="text-left">{{ pet_data.animal_type }}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        <p class="text-info"><strong>Breed</strong></p>
+                    </div>
+                    <div class="col-8">
+                        <p class="text-left">{{ pet_data.breed }}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        <p class="text-info"><strong>Disposition</strong></p>
+                    </div>
+                    <div class="col-8">
+                        <p class="text-left">{{ pet_data.disposition }}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        <p class="text-info"><strong>Date Created</strong></p>
+                    </div>
+                    <div class="col-8">
+                        <p class="text-left">{{ pet_data.last_update }}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        <p class="text-info"><strong>Description</strong></p>
+                    </div>
+                    <div class="col-8">
+                        <p class="text-left">{{ pet_data.description }}</p>
+                    </div>
+                </div>
                 <p class="text-left mt-2 ml-4">
                     <a href="/" class="btn btn-info"> Update Pet Info</a>
                     <a href="/" class="btn btn-danger"> Delete Pet</a>
                 </p>
-                <!-- Inner table with pet data ends here-->
             </div>
         </div>
     </div>
