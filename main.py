@@ -173,7 +173,7 @@ def browse_pets():
     
     # pet_type will come from a form. It will be dog, cat, other or None. 
     # If it is None, all pets will be returned.
-    pet_type = "other"
+    pet_type = None
 
     pets = h.browse_pets(db, pet_type)
     if not pets:

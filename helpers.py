@@ -98,7 +98,7 @@ def browse_pets(db, pet_type=None):
         pets_list =  list(pets.stream())
 
     pet_data = list(map(_get_document_data, pets_list))
-    pet_data.sort(key=lambda x: x["last_update"], reverse=True)
+    pet_data.sort(key=lambda x: x["date_created"], reverse=True)
     return pet_data
 
 def search_pets(db, attribute_dict):
