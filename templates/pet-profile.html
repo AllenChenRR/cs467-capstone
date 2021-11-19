@@ -23,7 +23,7 @@
 
                     </div>
                     <div class="col-8">
-                        <p class="text-left">{{ pet_data.availability }}</p>
+                        <p class="text-left">{{ pet_data.availability|title }}</p>
                     </div>
                 </div>
                 <div class="row">
@@ -32,7 +32,7 @@
 
                     </div>
                     <div class="col-8">
-                        <p class="text-left">{{ pet_data.animal_type }}</p>
+                        <p class="text-left">{{ pet_data.animal_type|title }}</p>
                     </div>
                 </div>
                 <div class="row">
@@ -40,7 +40,7 @@
                         <p class="text-info"><strong>Breed</strong></p>
                     </div>
                     <div class="col-8">
-                        <p class="text-left">{{ pet_data.breed }}</p>
+                        <p class="text-left">{{ pet_data.breed|title }}</p>
                     </div>
                 </div>
                 <div class="row">
@@ -50,7 +50,7 @@
                     <div class="col-8">
                         <p class="text-left">
                             {% for item in pet_data.disposition %} 
-                                {{ item }}{% if not loop.last %}, {% endif %} 
+                                {{ item|title}}{% if not loop.last %}, {% endif %} 
                             {% endfor %}
                         </p>
                     </div>
@@ -60,7 +60,7 @@
                         <p class="text-info"><strong>Date Created</strong></p>
                     </div>
                     <div class="col-8">
-                        <p class="text-left">{{ pet_data.date_created }}</p>
+                        <p class="text-left">{{ pet_data.date_created.strftime('%Y-%m-%d') }}</p>
                     </div>
                 </div>
                 <div class="row">

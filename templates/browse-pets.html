@@ -10,13 +10,13 @@
                 <div class="card h-100 bg-secondary">
                     <div class="card-body">
                         <div class="text-center">
-                            <img class="card-img-top img-fluid mx-auto" src="{{ pet.image }}" style="max-width:80%;max-height: fit-content">
+                            <img class="card-img-top img-fluid mx-auto img-thumbnail" src="{{ pet.image }}" style="max-height: fit-content">
                         </div>
                         <h5 class="card-title mt-3 text-center">{{ pet.name }}</h5>
                         <p class="card-text">
-                            <span class="text-info">Breed</span> {{ pet.breed }}
-                            <br><span class="text-info">Animal Type:</span> {{ pet.animal_type}}
-                            <br><span class="text-info">Availability:</span> {{ pet.availability}}
+                            <span class="text-info">Breed:</span> {{ pet.breed|title}}
+                            <br><span class="text-info">Animal Type:</span> {{ pet.animal_type|title}}
+                            <br><span class="text-info">Availability:</span> {{ pet.availability|title}}
                             <div class="text-center">
                                 <p><a class="btn btn-primary btn-sm" href="/pets/{{ pet.id }}">Learn More</a></p>
                             </div>
