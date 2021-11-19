@@ -2,6 +2,7 @@ from firebase_admin import credentials, firestore, initialize_app
 from flask import Flask, jsonify, redirect, request, session, render_template, flash, url_for
 import helpers as h
 import password as pw
+import constants as const
 import models
 import traceback
 from forms import EditPetForm, RegistrationForm, LoginForm, AccountForm, AddPetForm
@@ -31,14 +32,13 @@ default_app = initialize_app(cred)
 db = firestore.client()
 storage_client = storage.Client()
 bucket = storage_client.bucket(app.config['BUCKET'])
-DISPOSITIONS = ["good with children", "good with other animals",
-                "animal must be leashed at all times"]
-CAT_BREEDS = [("maine coon", "Maine Coon"), ("siamese", "Siamese"), ("american shorthair", "American Shorthair"), 
-                ("tabby", "Tabby"), ("other", "Other")]
-DOG_BREEDS = [("golden retriever", "Golden Retriever"), ("german shepherd", "German Shepherd"), ("bulldog", "Bulldog"), ("other", "Other")]
-OTHER_BREEDS = [("other", "Other")]
-ANIM_TYPES = [("cat", "Cat"), ("dog", "Dog"), ("other", "Other")]
-AVAILABILITIES = [('available', 'Available'), ('pending', 'Pending'), ('adopted', 'Adopted')]
+
+DISPOSITIONS = const.DISPOSITIONS_TO_DISPLAY
+CAT_BREEDS = const.CAT_BREEDS
+DOG_BREEDS = const.DOG_BREEDS
+OTHER_BREEDS = const.OTHER_BREEDS
+ANIM_TYPES = const.ANIM_TYPES
+AVAILABILITIES = const.AVAILABILITIES
 
 
 @app.route("/", methods=['GET'])

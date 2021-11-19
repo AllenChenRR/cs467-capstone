@@ -2,18 +2,17 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import widgets, StringField, PasswordField, SubmitField, SelectField, TextAreaField, SelectMultipleField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional
+import constants as const
 # This class was built with the assistance of the following tutorial:
 # "Python Flask Tutorial: Full-Featured Web App Part 3 - Forms and User Input"
 # Link: https://youtu.be/UIJKdCIEXUQ
 
-DISPOSITIONS = [("good with children", "Good with children"), ("good with other animals",
-                "Good with other animals"), ("animal must be leashed at all times",
-                "Animal must be leashed at all times")]
-CAT_BREEDS = [("maine coon", "Maine Coon"), ("siamese", "Siamese"), ("other", "Other")]
-DOG_BREEDS = [("retriever", "Retriever"), ("bulldog", "Bulldog"), ("other", "Other")]
-OTHER_BREEDS = [('other', 'Other')]
-ANIM_TYPES = [('cat', 'Cat'), ('dog', 'Dog'), ('other', 'Other')]
-AVAILABILITIES = [('available', 'Available'), ('pending', 'Pending'), ('adopted', 'Adopted')]
+DISPOSITIONS = const.DISPOSITIONS_FOR_FORMS
+CAT_BREEDS = const.CAT_BREEDS
+DOG_BREEDS = const.DOG_BREEDS
+OTHER_BREEDS = const.OTHER_BREEDS
+ANIM_TYPES = const.ANIM_TYPES
+AVAILABILITIES = const.AVAILABILITIES
 
 
 # Widgets

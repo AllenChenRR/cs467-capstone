@@ -6,12 +6,11 @@ from forms import AccountForm
 
 import helpers as h
 import password as pw
+import constants as const
 
-CAT_BREEDS = [("maine coon", "Maine Coon"), ("siamese", "Siamese"), ("american shorthair", "American Shorthair"), 
-                ("tabby", "Tabby"), ("other", "Other")]
-DOG_BREEDS = [("golden retriever", "Golden Retriever"), ("german shepherd", "German Shepherd"), ("bulldog", "Bulldog"), ("other", "Other")]
-OTHER_BREEDS = [("other", "Other")]
-
+CAT_BREEDS = const.CAT_BREEDS
+DOG_BREEDS = const.DOG_BREEDS
+OTHER_BREEDS = const.OTHER_BREEDS
 
 def update_pet(db, form, pet_id):
     data = _format_pet_data(form)
