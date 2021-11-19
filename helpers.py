@@ -7,8 +7,9 @@ from forms import AccountForm
 import helpers as h
 import password as pw
 
-CAT_BREEDS = [("maine coon", "Maine Coon"), ("siamese", "Siamese"), ("other", "Other")]
-DOG_BREEDS = [("retriever", "Retriever"), ("bulldog", "Bulldog"), ("other", "Other")]
+CAT_BREEDS = [("maine coon", "Maine Coon"), ("siamese", "Siamese"), ("american shorthair", "American Shorthair"), 
+                ("tabby", "Tabby"), ("other", "Other")]
+DOG_BREEDS = [("golden retriever", "Golden Retriever"), ("german shepherd", "German Shepherd"), ("bulldog", "Bulldog"), ("other", "Other")]
 OTHER_BREEDS = [("other", "Other")]
 
 

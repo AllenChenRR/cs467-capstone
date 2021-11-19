@@ -33,8 +33,9 @@ storage_client = storage.Client()
 bucket = storage_client.bucket(app.config['BUCKET'])
 DISPOSITIONS = ["good with children", "good with other animals",
                 "animal must be leashed at all times"]
-CAT_BREEDS = [("maine coon", "Maine Coon"), ("siamese", "Siamese"), ("other", "Other")]
-DOG_BREEDS = [("retriever", "Retriever"), ("bulldog", "Bulldog"), ("other", "Other")]
+CAT_BREEDS = [("maine coon", "Maine Coon"), ("siamese", "Siamese"), ("american shorthair", "American Shorthair"), 
+                ("tabby", "Tabby"), ("other", "Other")]
+DOG_BREEDS = [("golden retriever", "Golden Retriever"), ("german shepherd", "German Shepherd"), ("bulldog", "Bulldog"), ("other", "Other")]
 OTHER_BREEDS = [("other", "Other")]
 ANIM_TYPES = [("cat", "Cat"), ("dog", "Dog"), ("other", "Other")]
 AVAILABILITIES = [('available', 'Available'), ('pending', 'Pending'), ('adopted', 'Adopted')]
