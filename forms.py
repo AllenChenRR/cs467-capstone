@@ -72,7 +72,6 @@ class EditPetForm(FlaskForm):
     name = StringField("Name",  validators=[Optional(False), DataRequired(), Length(min=2, max=20)])
     animal_type = SelectField('Animal Type', choices=ANIM_TYPES)
     breed = SelectField('Breed')
-
     disposition = MultiCheckboxField('Disposition', choices=DISPOSITIONS)
     availability = SelectField('Availability', choices=AVAILABILITIES)
     description = TextAreaField('Description')

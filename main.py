@@ -251,8 +251,14 @@ def edit_pet_by_id(id):
                                                         form.animal_type.data)
             if form.validate_on_submit():
                 h.update_pet(db, form, id)
+                if form.image.data is not None:
+                    h.update_pet_image(app, db, id)
+                    blob = bucket.blob(id)
+                    blob.upload_from_file(form.image.data, rewind=True,
+                                    content_type='image/jpeg')
+                    blob.make_public()
                 flash(f'Pet {form.name.data} updated successfully', 'success')
-                return redirect(url_for("edit_pet_by_id", id))
+                return redirect(url_for("edit_pet_by_id", id=id))
         except Exception as e:
             traceback.print_exc()
     return render_template('edit-pet.html', title="Update pet content",
