@@ -60,6 +60,7 @@ def add_new_pet(db, form):
     Adds a new pet to the database
     """
     data = _format_pet_data(form)
+    data['date_created'] =  datetime.now()
     return _add_document(db, "Pets", data)
 
 
