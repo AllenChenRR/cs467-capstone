@@ -1,0 +1,121 @@
+{% extends "base.html"%}
+{% block content %}
+<div class="container w-50 mt-5 mx auto" style="max-width: 40rem;">
+    {% if title %}
+        <h2>{{title}}<h2>
+    {% endif %}
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            {{form.hidden_tag()}}
+            <fieldset class="form-group">
+                <!-- field: create date -->
+                <div class="form-group">
+                    {{form.date.label(class="form-label")}}
+                
+                    {% if form.date.errors %}
+                    {{form.date(class="form-control is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form.name.errors %}
+                        <span> {{error}} </span>
+                        {% endfor %}>
+                    </div>
+                    {% else %}
+                    {{form.date(class="form-control")}}
+                
+                    {% endif %}
+                </div>
+                <!-- field: name -->
+                <div class="form-group">
+                    {{form.name.label(class="form-label")}}
+
+                    {% if form.name.errors %}
+                        {{form.name(class="form-control is-invalid")}}
+                        <div class="invalid-feedback">
+                            {% for error in form.name.errors %}
+                                <span> {{error}} </span>
+                            {% endfor %}>
+                        </div>
+                    {% else %}
+                        {{form.name(class="form-control")}}
+
+                    {% endif %}
+                </div>
+
+                <!-- field: animal_type -->
+                <div class="form-group">
+                    {{form.animal_type.label(class="form-label")}}
+
+                    {% if form.animal_type.errors %}
+                        {{form.animal_type(class="form-control is-invalid")}}
+                        <div class="invalid-feedback">
+                            {% for error in form.animal_type.errors %}
+                                <span> {{error}} </span>
+                            {% endfor %}>
+                        </div>
+                    {% else %}
+                        {{form.animal_type(class="form-select")}}
+                    {% endif %}
+                </div>
+
+                <!-- field: breed -->
+                <div class="form-group">
+                    {{form.breed.label(class="form-label")}}
+
+                    {% if form.breed.errors %}
+                        {{form.breed(class="form-control is-invalid")}}
+                        <div class="invalid-feedback">
+                            {% for error in form.breed.errors %}
+                                <span> {{error}} </span>
+                            {% endfor %}>
+                        </div>
+                    {% else %}
+                        {{form.breed(class="form-select")}}
+                    {% endif %}
+                </div>
+
+                <!-- field: disposition -->
+                <div class="form-group">
+                    {{form.disposition.label(class="form-label ")}}
+
+                    {% if form.disposition.errors %}
+                        {{form.disposition(class="form-control is-invalid")}}
+                        <div class="invalid-feedback">
+                            {% for error in form.disposition.errors %}
+                                <span> {{error}} </span>
+                            {% endfor %}>
+                        </div>
+                    {% else %}    
+                            {{form.disposition(class="form-control form-check")}}
+                    {% endif %}
+                </div>
+
+                <!-- field: availability -->
+                <div class="form-group">
+                    {{form.availability.label(class="form-label")}}
+
+                    {% if form.availability.errors %}
+                        {{form.availability(class="form-control is-invalid")}}
+                        <div class="invalid-feedback">
+                            {% for error in form.availability.errors %}
+                                <span> {{error}} </span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{form.availability(class="form-select")}}
+                    {% endif %}
+                </div>
+
+            </fieldset>
+
+            <div class="form-group mt-2">
+                {{ form.submit(class="btn btn-info") }}
+            </div>
+        </form>
+    </div>
+
+</div>
+</span>
+{% block javascript %}
+    <script src="{{url_for('static', filename='scripts/searchbreeds.js')}}"></script>
+{% endblock %}
+{% endblock content %}

@@ -101,19 +101,41 @@ def browse_pets(db, pet_type=None):
     pet_data.sort(key=lambda x: x["date_created"], reverse=True)
     return pet_data
 
-def search_pets(db, attribute_dict):
-    # attribute_dict will be a form
-    # TODO create a function reads a form and puts it into a dict
-    attribute_dict = {"name": "The Notorious P.I.G."}
-    pets_ref = db.collection("Pets")
-    pets_query = ["pets_ref"]
-    for k, v in attribute_dict.items():
-        pets_query.append(f".where('{k}', '==', '{v}')")
-    pets_query_str = "".join(pets_query)
-    result = eval(pets_query_str)
-    for match in result.stream():
-        print(match.id)
 
+def search_pets_by_date_only():
+    pass
+    
+def search_pets(db, form):
+    # still needs to search by date
+   
+    pets_ref = db.collection("Pets")
+    result_list = []
+    pets_query = []
+    
+    if form.name.data :
+        pets_query.append(f".where('name', '==', '{form.name.data }')")
+    if form.animal_type.data  != "no_type":
+        pets_query.append(f".where('animal_type', '==', '{form.animal_type.data }')")
+    if form.breed.data:
+        pets_query.append(f".where('breed', '==', '{form.breed.data}')")
+    if form.availability.data:
+        pets_query.append(f".where('availability', '==', '{form.availability.data}')")
+    
+    if not pets_query:
+        if form.disposition.data:
+            pets_query.append(f".where('disposition', 'array_contains', '{form.disposition.data[0]}')")    
+    
+    pets_query.insert(0,"pets_ref")
+    pets_query_str = "".join(pets_query)
+    query_result = eval(pets_query_str)
+    
+    for match in query_result.stream():
+        if form.disposition.data:
+            if not sorted(match.to_dict()["disposition"]) == sorted(form.disposition.data):
+                continue
+        result_list.append(_get_document_data(match))
+    return result_list
+                
 
 def delete_pet(db, pet_id):
     """ 

@@ -1,0 +1,39 @@
+{% extends "base.html" %} 
+{% block content %}
+<div class="container mt-4 mx-auto">
+    <h1 class="text-center">Search Results</h1>
+    <div class="w-75 mx-auto container">
+        {% if pets %}
+        <p class="lead text-center">These are the pets we currently have available for adoption that match your search. </p>
+        <div class="row p-2">
+            {% for pet in pets %}
+            <div class="col-3 mb-4">
+                <div class="card h-100 bg-secondary">
+                    <div class="card-body">
+                        <div class="text-center">
+                            <img class="card-img-top img-fluid mx-auto img-thumbnail" src="{{ pet.image }}" style="max-height: fit-content">
+                        </div>
+                        <h5 class="card-title mt-3 text-center">{{ pet.name }}</h5>
+                        <p class="card-text">
+                            <span class="text-info">Breed:</span> {{ pet.breed|title}}
+                            <br><span class="text-info">Animal Type:</span> {{ pet.animal_type|title}}
+                            <br><span class="text-info">Availability:</span> {{ pet.availability|title}}
+                            <div class="text-center">
+                                <p><a class="btn btn-primary btn-sm" href="/pets/{{ pet.id }}">Learn More</a></p>
+                            </div>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+            {% else %}
+            <p class="lead text-center">There are no pets that match your search. </p>
+            {% endif %}
+
+    </div>
+</div>
+</div>
+
+
+{% endblock content %}

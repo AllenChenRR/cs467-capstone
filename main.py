@@ -6,14 +6,14 @@ import password as pw
 import constants as const
 import models
 import traceback
-from forms import EditPetForm, RegistrationForm, LoginForm, AccountForm, AddPetForm
+from forms import EditPetForm, RegistrationForm, LoginForm, AccountForm, AddPetForm, SearchPetForm
 from google.cloud import storage
 import os
 
 # Initialize Flask app
 app = Flask(__name__)
 
-# os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="key.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="key.json"
 
 # Set secret key for sessions
 app.secret_key = "sdkfjDCVBsdjKkl%@%23$"
@@ -40,6 +40,8 @@ DOG_BREEDS = const.DOG_BREEDS
 OTHER_BREEDS = const.OTHER_BREEDS
 ANIM_TYPES = const.ANIM_TYPES
 AVAILABILITIES = const.AVAILABILITIES
+NO_BREEDS = const.NO_BREEDS
+ANIM_SEARCH_TYPES = const.ANIM_SEARCH_TYPES
 
 
 @app.route("/", methods=['GET'])
@@ -227,8 +229,18 @@ def get_pet(id):
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
-    h.search_pets(db, {})
-    return "", 200
+
+    pets = []
+    form = SearchPetForm()
+    if form.is_submitted():
+        # print('date', form.date.data)
+    # if form.validate_on_submit():
+        pets = h.search_pets(db, form)
+        # print("this is pets",pets)
+        # if pets:
+        #     print("there are pets")
+        return render_template('search-results.html', title="Search Results", pets=pets)
+    return render_template('search.html', title="Search for pets", form=form)
 
 
 @app.route('/pets/<id>/edit', methods=['GET', 'POST'])
@@ -274,12 +286,15 @@ def edit_pet_by_id(id):
 # Handles generating breed choices based on animal type
 @app.route('/type/<get_breed_by_type>')
 def get_breed(get_breed_by_type):
+    
     if get_breed_by_type.lower() == "cat":
         return jsonify(CAT_BREEDS)
     elif get_breed_by_type.lower() == "dog":
         return jsonify(DOG_BREEDS)
     elif get_breed_by_type.lower() == "other":
         return jsonify(OTHER_BREEDS)
+    elif get_breed_by_type == "no_type":
+        return jsonify(NO_BREEDS)
     else:
         error_message = "Type not found"
         return render_template("error.html", error_message=error_message), 404

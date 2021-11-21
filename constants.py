@@ -9,3 +9,6 @@ DOG_BREEDS = [("golden retriever", "Golden Retriever"), ("german shepherd", "Ger
 OTHER_BREEDS = [("other", "Other")]
 ANIM_TYPES = [("cat", "Cat"), ("dog", "Dog"), ("other", "Other")]
 AVAILABILITIES = [('available', 'Available'), ('pending', 'Pending'), ('adopted', 'Adopted')]
+ANIM_SEARCH_TYPES = [("no_type", "All Types"),("cat", "Cat"), ("dog", "Dog"), ("other", "Other")]
+NO_BREEDS = [("", "")]
+SEARCH_AVAILABILITIES = [('', 'All'), ('available', 'Available'), ('pending', 'Pending'), ('adopted', 'Adopted')]
