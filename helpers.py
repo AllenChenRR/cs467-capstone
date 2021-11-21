@@ -106,7 +106,8 @@ def search_pets_by_date_only():
     pass
     
 def search_pets(db, form):
-    # still needs to search by date
+    # print(form.date.__dict__['raw_data'])
+   
    
     pets_ref = db.collection("Pets")
     result_list = []
@@ -122,9 +123,9 @@ def search_pets(db, form):
         pets_query.append(f".where('availability', '==', '{form.availability.data}')")
     
     if not pets_query:
-        if form.disposition.data:
+        if form.disposition.data and not form.date.__dict__['raw_data']:
             pets_query.append(f".where('disposition', 'array_contains', '{form.disposition.data[0]}')")    
-    
+   
     pets_query.insert(0,"pets_ref")
     pets_query_str = "".join(pets_query)
     query_result = eval(pets_query_str)
@@ -133,7 +134,13 @@ def search_pets(db, form):
         if form.disposition.data:
             if not sorted(match.to_dict()["disposition"]) == sorted(form.disposition.data):
                 continue
+          
+        form_date = form.date.__dict__['raw_data']  
+        if form_date[0]:
+            if not form_date[0] == str(match.to_dict()['date_created'].date()):
+                continue
         result_list.append(_get_document_data(match))
+            
     return result_list
                 
 

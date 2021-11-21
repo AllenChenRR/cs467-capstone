@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import widgets, StringField, PasswordField, SubmitField, SelectField, TextAreaField, SelectMultipleField, DateField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional
+from wtforms.fields.html5 import DateField
 import constants as const
 # This class was built with the assistance of the following tutorial:
 # "Python Flask Tutorial: Full-Featured Web App Part 3 - Forms and User Input"
@@ -82,14 +83,10 @@ class EditPetForm(FlaskForm):
     submit = SubmitField("Update")
 
 class SearchPetForm(FlaskForm):
-    date = StringField('Create Date')
+    date = DateField('Create Date', format='%m-%d-%Y')
     name = StringField("Name")
     animal_type = SelectField('Animal Type', choices=ANIM_SEARCH_TYPES)
     breed = SelectField('Breed')
     disposition = MultiCheckboxField('Disposition', choices=DISPOSITIONS)
     availability = SelectField('Availability', choices=SEARCH_AVAILABILITIES)
     submit = SubmitField("Search")
-    
-    # def validate_date(form, field):
-    #     if format('%m-%d-%Y'):
-    #         raise ValidationError('Must be in format month/day/year')

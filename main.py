@@ -229,16 +229,10 @@ def get_pet(id):
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
-
     pets = []
     form = SearchPetForm()
     if form.is_submitted():
-        # print('date', form.date.data)
-    # if form.validate_on_submit():
         pets = h.search_pets(db, form)
-        # print("this is pets",pets)
-        # if pets:
-        #     print("there are pets")
         return render_template('search-results.html', title="Search Results", pets=pets)
     return render_template('search.html', title="Search for pets", form=form)
 
