@@ -132,7 +132,8 @@ def search_pets(db, form):
     
     for match in query_result.stream():
         if form.disposition.data:
-            if not sorted(match.to_dict()["disposition"]) == sorted(form.disposition.data):
+            # if not sorted(match.to_dict()["disposition"]) == sorted(form.disposition.data):       # exact match
+            if not all(items in match.to_dict()["disposition"] for items in form.disposition.data): # disposition included
                 continue
           
         form_date = form.date.__dict__['raw_data']  
