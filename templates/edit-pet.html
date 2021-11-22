@@ -5,6 +5,11 @@
         <h2>{{title}}<h2>
     {% endif %}
     <div class="card-body">
+        {% if image %}
+            <img src="data:;base64, {{image}}" width=:"200" height="200"/>
+        {% else %}
+            <p2>No profile picture found</p2>>
+        {% endif %}
         <form method="POST" enctype="multipart/form-data">
             {{form.hidden_tag()}}
             <fieldset class="form-group">

@@ -1,3 +1,4 @@
+from base64 import b64encode
 from firebase_admin import credentials, firestore, initialize_app
 from flask import Flask, jsonify, redirect, request, session, render_template, flash, url_for
 import helpers as h
@@ -236,7 +237,11 @@ def edit_pet_by_id(id):
     if pet_data is None:
         error_message = "Pet not found"
         return render_template("error.html", error_message=error_message), 404
-
+    image_blob = bucket.get_blob(id)
+    if image_blob is not None:
+        image = b64encode(image_blob.download_as_bytes()).decode("utf-8")
+    else:
+        image = None
     form = EditPetForm()
     # Changes the choices to match current pet
     form.animal_type.choices = h.create_default_list(pet_data['animal_type'], ANIM_TYPES)
@@ -263,7 +268,7 @@ def edit_pet_by_id(id):
         except Exception as e:
             traceback.print_exc()
     return render_template('edit-pet.html', title="Update pet content",
-                           pet_data=pet_data, form=form)
+                           pet_data=pet_data, form=form, image=image)
 
 
 # Handles generating breed choices based on animal type
