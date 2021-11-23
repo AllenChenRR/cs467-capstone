@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+{% if session['user'] and session['user']['is_admin'] == True %}
 <div class="container w-50 mt-5">
 <h1>Add A Pet to the Shelter</h1>
 <form method="POST" enctype="multipart/form-data">
@@ -123,6 +124,12 @@
         </div>
     </form>
 </div>
+{% else %}
+<div class="container text-center mx-auto mt-5">
+<h1 class="text-danger">404 Not Found</h1>
+<p class="lead">Oops! The page you're looking for does not exist.</p>
+</div>
+{% endif %}
 {% block javascript %}
     <script src="{{url_for('static', filename='scripts/loadbreeds.js')}}"></script>
 {% endblock %}

@@ -220,9 +220,12 @@ def get_pet(id):
 
 @app.route('/pets/<id>/delete', methods=['GET'])
 def delete_pet(id):
-    h.delete_pet(db, id)
-    flash(f'Pet deleted successfully', 'success')
-    return redirect(url_for("browse_pets"))
+    if 'user' in session and session['user']['is_admin'] is True:
+        h.delete_pet(db, id)
+        flash(f'Pet deleted successfully', 'success')
+        return redirect(url_for("browse_pets"))
+    else:
+        return '404 Not Found'
 
 
 @app.route('/search', methods=['GET', 'POST'])
