@@ -99,34 +99,37 @@ def user_account():
     'GET' - populates Account update form with the current user data from the database
     'POST' - Updates database with all data for the user from the content of the Account update form
     """
-    form = AccountForm()
-    if request.method == 'GET':
-        form.first_name.data = session['user']['first_name']
-        form.last_name.data = session['user']['last_name']
-        form.email.data = session['user']['email']
+    if 'user' in session:
+        form = AccountForm()
+        if request.method == 'GET':
+            form.first_name.data = session['user']['first_name']
+            form.last_name.data = session['user']['last_name']
+            form.email.data = session['user']['email']
 
-    elif request.method == 'POST':
-        try:
-            if form.validate_on_submit():
-                user_id = session['user']['id']
+        elif request.method == 'POST':
+            try:
+                if form.validate_on_submit():
+                    user_id = session['user']['id']
 
-                # Check if the email is already in use
-                user = h.get_user_by_email(db, form.email.data)
-                if user and user["id"] != user_id:
-                    flash(f'Email { form.email.data } is already in use.', 'danger')
-                    return redirect('/account')
+                    # Check if the email is already in use
+                    user = h.get_user_by_email(db, form.email.data)
+                    if user and user["id"] != user_id:
+                        flash(f'Email { form.email.data } is already in use.', 'danger')
+                        return redirect('/account')
 
-                salt, hash = h.get_salt_and_hash(db, user_id)
-                if pw.is_valid_password(salt, form.password.data, hash):
-                    h.update_user(db, form, user_id)
-                    flash('Update successful!', 'success')
+                    salt, hash = h.get_salt_and_hash(db, user_id)
+                    if pw.is_valid_password(salt, form.password.data, hash):
+                        h.update_user(db, form, user_id)
+                        flash('Update successful!', 'success')
+                    else:
+                        flash('Invalid password. Please try again.', 'danger')
                 else:
-                    flash('Invalid password. Please try again.', 'danger')
-            else:
-                flash('Update unsuccessful. Please try again.', 'danger')
-        except Exception as e:
-            return f"An Error Occured: {e}"
-    return render_template("account.html", title="Account", form=form)
+                    flash('Update unsuccessful. Please try again.', 'danger')
+            except Exception as e:
+                return f"An Error Occured: {e}"
+        return render_template("account.html", title="Account", form=form)
+    else:
+        return render_template('404.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -225,7 +228,7 @@ def delete_pet(id):
         flash(f'Pet deleted successfully', 'success')
         return redirect(url_for("browse_pets"))
     else:
-        return '404 Not Found'
+        return render_template('404.html')
 
 
 @app.route('/search', methods=['GET', 'POST'])
