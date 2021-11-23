@@ -33,6 +33,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('browse_pets') }}">Browse Pets</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('search') }}">Search for a Pet</a>
+                </li>
                 {% if session['user'] %}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('user_account') }}">Account</a>
@@ -48,16 +51,15 @@
                     <a class="nav-link" href="{{ url_for('signup') }}">Sign Up</a>
                 </li>
                 {% endif %}
+                {% if session['user'] and session['user']['is_admin'] == True %}
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Admin</a>
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" style="color:#1ccae3">Admin</a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="{{ url_for('add_pet') }}">Add Pet To Shelter</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Separated link</a>
                     </div>
                 </li>
+                {% endif %}
+
             </ul>
         </div>
     </div>
@@ -66,19 +68,18 @@
 <body>
 
     {% with messages = get_flashed_messages(with_categories=true) %} 
-        {% if messages %} 
-            {% for category, message in messages %}
-            <div class="alert alert-dismissible alert-{{ category }} w-75 mx-auto">
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </button>
-                {{ message }}
-            </div>
-            {% endfor %} 
-        {% endif %} 
+	    {% if messages %} 
+		    {% for category, message in messages %}
+		    <div class="alert alert-dismissible alert-{{ category }} w-75 mx-auto">
+		        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+		        </button>
+		        {{ message }}
+		    </div>
+		    {% endfor %} 
+	    {% endif %} 
     {% endwith %} 
 
-    {% block content %} 
-    {% endblock content %}
+    {% block content %} {% endblock content %}
 
     <!-- Optional JavaScript; choose one of the two! -->
 

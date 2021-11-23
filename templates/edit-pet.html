@@ -2,11 +2,11 @@
 {% block content %}
 <div class="container w-50 mt-5 mx auto" style="max-width: 40rem;">
     {% if title %}
-        <h2>{{title}}<h2>
+        <h2 class="text-center">{{title}}<h2>
     {% endif %}
     <div class="card-body">
         {% if image %}
-            <img src="data:;base64, {{image}}" width=:"200" height="200"/>
+            <div class="text-center"><img src="data:;base64, {{image}}" width=:"200" height="200"/></div>
         {% else %}
             <p2>No profile picture found</p2>>
         {% endif %}
@@ -131,6 +131,9 @@
                 {{ form.submit(class="btn btn-info") }}
             </div>
         </form>
+        <p class="text-center mt-4">
+	         <a href="/pets/{{pet_data.id}}" class="btn btn-success">Back to pet profile</a>
+        </p>
     </div>
 
 </div>

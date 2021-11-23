@@ -1,4 +1,5 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} 
+{% block content %}
 <div class="container mt-5 mx-auto">
     <h2 class="text-center"> Animal Info </h2>
     <div class="container mx-auto">
@@ -71,10 +72,18 @@
                         <p class="text-left">{{ pet_data.description }}</p>
                     </div>
                 </div>
-                <p class="text-left mt-2 ml-4">
-                    <a href="/pets/{{pet_data.id}}/edit" class="btn btn-info"> Update Pet Info</a>
-                    <a href="/" class="btn btn-danger"> Delete Pet</a>
-                </p>
+                {% if session['user'] %}
+                    <p class="text-left mt-2 ml-4">
+                    {% if session['user']['is_admin'] == True %}
+                        <a href="/pets/{{pet_data.id}}/edit" class="btn btn-info"> Update Pet Info</a>
+                        <a href="/pets/{{pet_data.id}}/delete" class="btn btn-danger"> Delete Pet</a>
+                    {% else %}
+                    <a href="/" class="btn btn-info mt-4 text-center">Adopt Me Today!</a>
+                    </p>
+                    {% endif %}
+                {% else %}
+                <p class="lead mt-5">Interested? <a href="{{ url_for('signup') }}">Sign Up</a> today or <a href="{{ url_for('login') }}">login</a> to begin the adoption process.</p>
+                {% endif %}
             </div>
         </div>
     </div>

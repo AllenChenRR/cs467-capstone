@@ -210,21 +210,19 @@ def add_pet():
     return render_template('add-pet.html', title="Add a Pet to the Shelter", form=form)
 
 
-@app.route('/pets/<id>', methods=['GET', 'DELETE'])
+@app.route('/pets/<id>', methods=['GET'])
 def get_pet(id):
-    # I changed the name of this since it was the same as a helper function
     if request.method == "GET":
         pet_data = h.get_pet_by_id(db, id)
         if not pet_data:
             return render_template('does-not-exist.html')
-    elif request.method == "DELETE":
-        h.delete_pet(db, id)
-        return render_template('does-not-exist.html')
-    elif request.method == "POST":
-        # update pet
-        pass
-
     return render_template('pet-profile.html', pet_data=pet_data)
+
+@app.route('/pets/<id>/delete', methods=['GET'])
+def delete_pet(id):
+    h.delete_pet(db, id)
+    flash(f'Pet deleted successfully', 'success')
+    return redirect(url_for("browse_pets"))
 
 
 @app.route('/search', methods=['GET', 'POST'])
