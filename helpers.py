@@ -12,6 +12,10 @@ CAT_BREEDS = const.CAT_BREEDS
 DOG_BREEDS = const.DOG_BREEDS
 OTHER_BREEDS = const.OTHER_BREEDS
 
+def set_pet_avail(db, app, id, avail):
+    db.collection(app.config['PETS']).document(id).update({"availability": avail})
+
+
 def update_pet(db, form, pet_id):
     data = _format_pet_data(form)
     _set_document(db, "Pets", data, doc_id=pet_id, merge=True)

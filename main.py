@@ -213,12 +213,21 @@ def add_pet():
     return render_template('add-pet.html', title="Add a Pet to the Shelter", form=form)
 
 
-@app.route('/pets/<id>', methods=['GET'])
+@app.route('/pets/<id>', methods=['GET', 'POST'])
 def get_pet(id):
     if request.method == "GET":
         pet_data = h.get_pet_by_id(db, id)
         if not pet_data:
             return render_template('does-not-exist.html')
+    elif request.method == "POST":
+        try:
+            # Makes the pet document's availability pending
+            h.set_pet_avail(db, app, id, "pending")
+            flash(f'Pet adopted', 'success')
+            return 200
+        except:
+            traceback.print_exc()
+            return 404
     return render_template('pet-profile.html', pet_data=pet_data)
 
 @app.route('/pets/<id>/delete', methods=['GET'])
