@@ -56,6 +56,7 @@
                     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" style="color:#1ccae3">Admin</a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="{{ url_for('add_pet') }}">Add Pet To Shelter</a>
+                        <a class="dropdown-item" href="/">Add a News Item</a>
                     </div>
                 </li>
                 {% endif %}
@@ -93,10 +94,27 @@
     -->
 </body>
 
-<footer class="footer">
-    <div class="container">
-        <p class="text-muted"> </p>
+<footer id="footer">
+    <div class="container-fluid" >
+        <div class="row text-right w-100">
+            <div class="col-6">
+                <div class="mr-5 p-2">
+                    <h4 class="text-left text-light">Credits</h4>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="ml-5 p-2 text-info">
+                    <small>
+                        Bootstrap Theme by <a href="https://bootswatch.com">BootSwatch</a>
+                        <br>Stock images from <a href="https://unsplash.com/">Unsplash</a>
+                    </small>
+                </div>
+
+            </div>
+        </div>
+
     </div>
+
 </footer>
 
 </html>

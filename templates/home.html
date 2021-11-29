@@ -34,11 +34,11 @@
 </div>
 
 
-<div class="container text-center mt-4">
+<div class="container text-center mt-5">
     <h3>WHAT OUR CLIENTS ARE SAYING</h3>
     <div class="row">
         <div class="col-md-4 my-2">
-            <i class="fas fa-quote-left fa-2x text-primary mb-3"></i>
+            <i class="fas fa-quote-left fa-2x text-primary"></i>
             <blockquote class="blockquote">
                 <p>The amount of care and attention that goes towards any pet that arrives at this shelter is unmatched. Plenty of Pets sincerely cares about the animals it rescues. Look no further for your best friend for life.
                 </p>
@@ -46,14 +46,14 @@
             </blockquote>
         </div>
         <div class="col-md-4 my-2">
-            <i class="fas fa-quote-left fa-2x text-primary mb-3"></i>
+            <i class="fas fa-quote-left fa-2x text-primary"></i>
             <blockquote class="blockquote">
                 <p>This organization is doing wonders for our community. I will continue to adopt pets from here for years to come.</p>
                 <footer class="blockquote-footer">Jane Doe</footer>
             </blockquote>
         </div>
         <div class="col-md-4 my-2">
-            <i class="fas fa-quote-left fa-2x text-primary mb-3"></i>
+            <i class="fas fa-quote-left fa-2x text-primary"></i>
             <blockquote class="blockquote">
                 <p>I just adopted my new best friend from Plenty of Pets. They were able to match me perfectly with a pet that suited my needs. 100% recommend them.</p>
                 <footer class="blockquote-footer">John Smith</footer>
@@ -62,5 +62,22 @@
     </div>
 </div>
 
+<div class="bg-dark">
+    <div class="container text-center p-3">
+        <h1>News and Updates</h1>
+        <div class="row m-2">
+            <div class="col-6 p-3 text-center mx-auto">
+                <div class="card bg-secondary">
+                    <!-- This image can also be replaced with one from the DB -->
+                    <img src="{{ url_for('static', filename='images/image01.jpeg') }}" alt="" class="card-img-top">
+                    <div class="card-body">
+                        <h2 class="card-title text-info">Title of news item</h2>
+                        <p class="card-text">Description of news item</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock content %}
