@@ -71,7 +71,7 @@
                     {% if image %}
                     <div class="text-center"><img src="data:;base64, {{image}}" alt="" class="card-img-top"/></div>
                     {% else %}
-                        <p2>No profile picture found</p2>>
+                        <p2><img src="{{ url_for('static', filename='images/cat-dog.png') }}" class="d-block w-100" alt="..."></p2>>
                     {% endif %}
                     <div class="card-body">
                         {% if item %}
