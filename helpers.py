@@ -25,17 +25,6 @@ def news_dict(form):
     }
 
 
-def add_news_item(db, form, app):
-    "Adds news item to database"
-    data = {
-        "date_added": form.date_added,
-        "description": form.description,
-        "image": form.image,
-        "title": form.title
-    }
-
-    doc_ref = db.collection(app.config['NEWS'])
-
 def update_pet(db, form, pet_id):
     data = _format_pet_data(form)
     _set_document(db, "Pets", data, doc_id=pet_id, merge=True)

@@ -338,14 +338,6 @@ def get_breed(get_breed_by_type):
         error_message = "Type not found"
         return render_template("error.html", error_message=error_message), 404
 
-# @app.route("/news-item", methods=["GET", "POST"])
-# def add_news_item():
-#     """
-#     Adds a news item to the front page.
-#     """
-#     form = NewsItemForm()
-
-#     return render_template('news-item.html', title="Add News Item", form=form)
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
