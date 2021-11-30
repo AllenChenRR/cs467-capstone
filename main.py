@@ -1,4 +1,5 @@
 from base64 import b64encode
+from logging import error
 from firebase_admin import credentials, firestore, initialize_app
 from flask import Flask, jsonify, redirect, request, session, render_template, flash, url_for
 import helpers as h
@@ -24,6 +25,7 @@ app.config['BUCKET'] = "cs467-group-app.appspot.com"  # jamies bucket
 app.config['STORAGE_URL'] = "https://storage.googleapis.com"
 app.config['USERS'] = 'Users'
 app.config['PETS'] = 'Pets'
+app.config['NEWS'] = 'NewsItem'
 
 # Initialize Firestore DB
 # cred = credentials.Certificate('serviceAccountKey.json') # Allen's key
@@ -288,6 +290,24 @@ def edit_pet_by_id(id):
             traceback.print_exc()
     return render_template('edit-pet.html', title="Update pet content",
                            pet_data=pet_data, form=form, image=image)
+
+@app.route('/news-item', methods=['GET', 'POST'])
+def news_item():
+    if 'user' in session and session['user']['is_admin'] is True: 
+        pass
+        # form = NewsItemForm()
+        # if form.validate_on_submit():
+            # items = db.collection(app.config['NEWS'])
+            # item = items[0]
+            # data = news_dict(form)
+            # item.update(data)
+            # flash(f'News Item updated successfully', 'success')
+            # return redirect(url_for("news_item"))
+
+        # return render_template('news-item.html', title="Add News Item", form=form)
+    else:
+        error_message = "Unauthorized Access"
+        return render_template("error.html", error_message=error_message), 401
 
 
 # Handles generating breed choices based on animal type
