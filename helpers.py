@@ -18,10 +18,10 @@ def set_pet_avail(db, app, id, avail):
 
 def news_dict(form):
     return {
-        "date_added": form.date_added,
-        "description": form.description,
-        "image": form.image,
-        "title": form.title
+        "date_added": datetime.now(),
+        "description": form.description.data,
+        "image": "https://storage.googleapis.com/cs467-group-app.appspot.com/mMyTJczVhKO7YUg1RJyc",
+        "title": form.title.data
     }
 
 

@@ -68,11 +68,19 @@
         <div class="row m-2">
             <div class="col-6 p-3 text-center mx-auto">
                 <div class="card bg-secondary">
-                    <!-- This image can also be replaced with one from the DB -->
-                    <img src="{{ url_for('static', filename='images/image01.jpeg') }}" alt="" class="card-img-top">
+                    {% if image %}
+                    <div class="text-center"><img src="data:;base64, {{image}}" alt="" class="card-img-top"/></div>
+                    {% else %}
+                        <p2>No profile picture found</p2>>
+                    {% endif %}
                     <div class="card-body">
-                        <h2 class="card-title text-info">Title of news item</h2>
-                        <p class="card-text">Description of news item</p>
+                        {% if item %}
+                        <h2 class="card-title text-info">{{ item.title }}</h2>
+                        <p class="card-text">{{ item.description }}</p>
+                        {% else %}
+                            <h2 class="card-title text-info">Title of news item</h2>
+                            <p class="card-text">Description of news item</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>

@@ -49,7 +49,16 @@ ANIM_SEARCH_TYPES = const.ANIM_SEARCH_TYPES
 @app.route("/", methods=['GET'])
 @app.route("/home")
 def home():
-    return render_template("home.html")
+    # news item id
+    id = "mMyTJczVhKO7YUg1RJyc"
+    image_blob = bucket.get_blob(id)
+    if image_blob is not None:
+        image = b64encode(image_blob.download_as_bytes()).decode("utf-8")
+    else:
+        image = None
+
+    item = db.collection(app.config['NEWS']).document(id).get().to_dict()
+    return render_template("home.html", image = image, item=item)
 
 
 @app.route("/signup", methods=["GET", "POST"])
@@ -292,19 +301,22 @@ def edit_pet_by_id(id):
                            pet_data=pet_data, form=form, image=image)
 
 @app.route('/news-item', methods=['GET', 'POST'])
-def news_item():
+def add_news_item():
     if 'user' in session and session['user']['is_admin'] is True: 
-        pass
-        # form = NewsItemForm()
-        # if form.validate_on_submit():
-            # items = db.collection(app.config['NEWS'])
-            # item = items[0]
-            # data = news_dict(form)
-            # item.update(data)
-            # flash(f'News Item updated successfully', 'success')
-            # return redirect(url_for("news_item"))
+        form = NewsItemForm()
+        if form.validate_on_submit():
+            id = "mMyTJczVhKO7YUg1RJyc"
+            blob = bucket.blob(id)
+            blob.upload_from_file(form.image.data, rewind=True,
+                                  content_type='image/jpeg')
+            blob.make_public()
+            item = db.collection(app.config['NEWS'])
+            data = h.news_dict(form)
+            item.document(id).set(data, merge=True)
+            flash(f'News Item updated successfully', 'success')
+            return redirect(url_for("add_news_item"))
 
-        # return render_template('news-item.html', title="Add News Item", form=form)
+        return render_template('news-item.html', title="Add News Item", form=form)
     else:
         error_message = "Unauthorized Access"
         return render_template("error.html", error_message=error_message), 401
@@ -326,14 +338,14 @@ def get_breed(get_breed_by_type):
         error_message = "Type not found"
         return render_template("error.html", error_message=error_message), 404
 
-@app.route("/news-item", methods=["GET", "POST"])
-def add_news_item():
-    """
-    Adds a news item to the front page.
-    """
-    form = NewsItemForm()
+# @app.route("/news-item", methods=["GET", "POST"])
+# def add_news_item():
+#     """
+#     Adds a news item to the front page.
+#     """
+#     form = NewsItemForm()
 
-    return render_template('news-item.html', title="Add News Item", form=form)
+#     return render_template('news-item.html', title="Add News Item", form=form)
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
