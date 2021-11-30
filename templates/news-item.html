@@ -1,0 +1,46 @@
+{% extends "base.html" %} {% block content %} {% if session['user'] and session['user']['is_admin'] == True %}
+<div class="container w-50 mt-5 p-2">
+    <h1>Add A News Item to the Front page</h1>
+    <p class="text-warning lead">Note: Adding a new news item will replace the one on the front page!</p>
+    <p></p>
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <div class="form-group">
+                {{ form.title.label(class="form-label") }} {% if form.title.errors %} {{ form.title(class="form-control is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.name.errors %}
+                    <span> {{ error }} </span> {% endfor %}
+                </div>
+                {% else %} {{ form.title(class="form-control") }} {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.description.label(class="form-label") }} {% if form.description.errors %} {{ form.description(class="form-control is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.description.errors %}
+                    <span> {{ error }} </span> {% endfor %}
+                </div>
+                {% else %} {{ form.description(class="form-control") }} {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.image.label(class="form-label") }} {% if form.image.errors %} {{ form.image(class="form-control is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.image.errors %}
+                    <span> {{ error }} </span> {% endfor %}
+                </div>
+                {% else %} {{ form.image(class="form-control", type="file") }} {% endif %}
+            </div>
+        </fieldset>
+        <div class="form-group mt-2">
+            {{ form.submit(class="btn btn-info") }}
+        </div>
+    </form>
+</div>
+{% else %}
+<div class="container text-center mx-auto mt-5">
+    <h1 class="text-danger">404 Not Found</h1>
+    <p class="lead">Oops! The page you're looking for does not exist.</p>
+</div>
+{% endif %} {% block javascript %}
+<script src="{{url_for('static', filename='scripts/loadbreeds.js')}}"></script>
+{% endblock %} {% endblock content %}

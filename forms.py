@@ -90,3 +90,10 @@ class SearchPetForm(FlaskForm):
     disposition = MultiCheckboxField('Disposition', choices=DISPOSITIONS)
     availability = SelectField('Availability', choices=SEARCH_AVAILABILITIES)
     submit = SubmitField("Search")
+
+class NewsItemForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired(), Length(max=60)])
+    description = TextAreaField('Description', validators=[DataRequired()])
+    image = FileField('Image', validators=[FileRequired(), FileAllowed(['png', 'jpeg', 'jpg'], "Invalid image format!")
+    ])
+    submit = SubmitField('Add To Front Page')
